@@ -1,0 +1,34 @@
+appId: com.ahlalkaram.store
+productName: أهل الكرم
+artifactName: "AhlAlKaram-${version}-${arch}.${ext}"
+directories:
+  output: release/windows
+  buildResources: electron
+files:
+  - electron/main.cjs
+  - electron/icon.ico
+  - electron/app-url.json
+  - package.json
+extraMetadata:
+  main: electron/main.cjs
+  version: 1.0.0
+asar: true
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+    - target: portable
+      arch:
+        - x64
+  icon: electron/icon.ico
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: أهل الكرم
+portable:
+  artifactName: "AhlAlKaram-Portable-${version}-${arch}.${ext}"
+publish: null

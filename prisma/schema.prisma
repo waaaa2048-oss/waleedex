@@ -1,0 +1,431 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum StoreType {
+  SLAUGHTERHOUSE
+  CLOTHING
+  GROCERY
+  FROZEN
+}
+
+enum StoreStatus {
+  PRIVATE
+  DRAFT
+  PUBLISHED
+}
+
+model stores {
+  id         Int        @id @default(autoincrement())
+  name       String
+  slug       String     @unique
+  store_type StoreType  @default(SLAUGHTERHOUSE)
+  status     StoreStatus @default(PUBLISHED)
+  logo_url   String?
+  created_at DateTime   @default(now()) @db.Timestamptz(6)
+  updated_at DateTime   @default(now()) @db.Timestamptz(6)
+
+  products  products[]
+  categories categories[]
+  orders    orders[]
+  reviews   reviews[]
+}
+
+model activity_logs {
+  id         Int      @id @default(autoincrement())
+  actor_name String   @default("النظام")
+  action     String
+  entity     String   @default("عام")
+  entity_id  String?
+  details    String   @default("")
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+}
+
+model app_releases {
+  id            Int      @id @default(autoincrement())
+  release_group String
+  platform      String
+  version       String
+  notes         String   @default("")
+  artifact_url  String?
+  status        String   @default("draft")
+  created_at    DateTime @default(now()) @db.Timestamptz(6)
+  updated_at    DateTime @default(now()) @db.Timestamptz(6)
+}
+
+model categories {
+  id           Int      @id @default(autoincrement())
+  store_id     Int?     @default(1)
+  name         String
+  slug         String
+  blurb        String   @default("")
+  image_url    String?
+  sort_order   Int      @default(0)
+  is_active    Boolean  @default(true)
+  is_highlight Boolean  @default(false)
+  created_at   DateTime @default(now()) @db.Timestamptz(6)
+
+  store stores? @relation(fields: [store_id], references: [id], onDelete: Cascade)
+}
+
+model coupons {
+  id          Int       @id @default(autoincrement())
+  code        String    @unique(map: "coupons_code_unique")
+  type        String    @default("percent")
+  value       Decimal   @default(0) @db.Decimal(10, 2)
+  min_order   Decimal   @default(0) @db.Decimal(10, 2)
+  usage_limit Int       @default(0)
+  used_count  Int       @default(0)
+  description String    @default("")
+  expires_at  DateTime? @db.Date
+  is_active   Boolean   @default(true)
+  created_at  DateTime  @default(now()) @db.Timestamptz(6)
+}
+
+model customer_sessions {
+  token       String    @id
+  customer_id Int
+  expires_at  DateTime  @db.Timestamptz(6)
+  created_at  DateTime  @default(now()) @db.Timestamptz(6)
+  customers   customers @relation(fields: [customer_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "customer_sessions_customer_id_customers_id_fk")
+}
+
+model customers {
+  id                Int                 @id @default(autoincrement())
+  name              String
+  phone             String
+  email             String?
+  city              String              @default("الرياض")
+  address           String?
+  notes             String?
+  password_hash     String?
+  is_vip            Boolean             @default(false)
+  created_at        DateTime            @default(now()) @db.Timestamptz(6)
+  customer_sessions customer_sessions[]
+  orders            orders[]
+  reviews           reviews[]
+}
+
+model integrations {
+  id         Int      @id @default(autoincrement())
+  key        String   @unique(map: "integrations_key_unique")
+  name       String
+  category   String   @default("أدوات")
+  url        String   @default("")
+  account_id String?
+  is_enabled Boolean  @default(false)
+  notes      String   @default("")
+  updated_at DateTime @default(now()) @db.Timestamptz(6)
+}
+
+model order_items {
+  id          Int       @id @default(autoincrement())
+  order_id    Int
+  product_id  Int?
+  name        String
+  animal_type String    @default("خروف")
+  quantity    Int       @default(1)
+  weight_kg   Decimal   @default(0) @db.Decimal(8, 2)
+  unit_price  Decimal   @default(0) @db.Decimal(10, 2)
+  line_total  Decimal   @default(0) @db.Decimal(12, 2)
+  orders      orders    @relation(fields: [order_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "order_items_order_id_orders_id_fk")
+  products    products? @relation(fields: [product_id], references: [id], onUpdate: NoAction, map: "order_items_product_id_products_id_fk")
+}
+
+model order_services {
+  id         Int       @id @default(autoincrement())
+  order_id   Int
+  service_id Int?
+  name       String
+  quantity   Int       @default(1)
+  unit_price Decimal   @default(0) @db.Decimal(10, 2)
+  line_total Decimal   @default(0) @db.Decimal(12, 2)
+  orders     orders    @relation(fields: [order_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "order_services_order_id_orders_id_fk")
+  services   services? @relation(fields: [service_id], references: [id], onUpdate: NoAction, map: "order_services_service_id_services_id_fk")
+}
+
+model orders {
+  id                     Int              @id @default(autoincrement())
+  store_id               Int?             @default(1)
+  code                   String           @unique(map: "orders_code_unique")
+  customer_id            Int
+  status                 String           @default("new")
+  fulfillment            String           @default("delivery")
+  delivery_date          DateTime?        @db.Date
+  delivery_address       String?
+  notes                  String?
+  total_amount           Decimal          @default(0) @db.Decimal(12, 2)
+  paid_amount            Decimal          @default(0) @db.Decimal(12, 2)
+  payment_method         String           @default("cash")
+  created_at             DateTime         @default(now()) @db.Timestamptz(6)
+  updated_at             DateTime         @default(now()) @db.Timestamptz(6)
+  delivery_fee           Decimal          @default(0) @db.Decimal(10, 2)
+  tabby_payment_id       String?          @unique
+  tabby_payment_status   String           @default("not_started")
+  payment_receipt_path   String?
+  tamara_order_id        String?          @unique
+  tamara_payment_status  String           @default("not_started")
+  moyasar_payment_id     String?          @unique
+  moyasar_payment_status String           @default("not_started")
+  order_items            order_items[]
+  order_services         order_services[]
+  customers              customers        @relation(fields: [customer_id], references: [id], onUpdate: NoAction, map: "orders_customer_id_customers_id_fk")
+  shipments              shipments[]
+
+  store stores? @relation(fields: [store_id], references: [id], onDelete: Cascade)
+}
+
+model product_inventory_movements {
+  id             Int       @id @default(autoincrement())
+  product_id     Int?
+  product_name   String
+  previous_stock Int
+  new_stock      Int
+  reason         String    @default("تعديل يدوي")
+  actor_name     String    @default("النظام")
+  created_at     DateTime  @default(now()) @db.Timestamptz(6)
+  products       products? @relation(fields: [product_id], references: [id], onUpdate: NoAction)
+
+  @@index([created_at(sort: Desc)])
+}
+
+model products {
+  id                          Int                           @id @default(autoincrement())
+  store_id                    Int?                          @default(1)
+  sku                         String                        @unique
+  name                        String
+  animal_type                 String                        @default("خروف")
+  category                    String                        @default("النعيمي الكشميري")
+  kind                        String                        @default("ready")
+  description                 String                        @default("")
+  weight_kg                   Decimal                       @default(0) @db.Decimal(8, 2)
+  price_per_kg                Decimal                       @default(0) @db.Decimal(10, 2)
+  fixed_price                 Decimal?                      @db.Decimal(10, 2)
+  stock                       Int                           @default(0)
+  image_url                   String?
+  origin                      String                        @default("")
+  is_active                   Boolean                       @default(true)
+  is_featured                 Boolean                       @default(false)
+  created_at                  DateTime                      @default(now()) @db.Timestamptz(6)
+  updated_at                  DateTime                      @default(now()) @db.Timestamptz(6)
+  order_items                 order_items[]
+  product_inventory_movements product_inventory_movements[]
+  product_modifiers           product_modifiers[]
+  reviews                     reviews[]
+
+  store stores? @relation(fields: [store_id], references: [id], onDelete: Cascade)
+}
+
+model product_modifiers {
+  id         Int      @id @default(autoincrement())
+  product_id Int
+  name       String
+  type       String   @default("select")
+  required   Boolean  @default(false)
+  options    Json     @default("[]")
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+
+  product products @relation(fields: [product_id], references: [id], onDelete: Cascade)
+}
+
+model reviews {
+  id         Int      @id @default(autoincrement())
+  store_id   Int?     @default(1)
+  product_id Int?
+  customer_id Int?
+  rating     Int      @default(5)
+  comment    String   @default("")
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+
+  store    stores?    @relation(fields: [store_id], references: [id], onDelete: Cascade)
+  product  products?  @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  customer customers? @relation(fields: [customer_id], references: [id], onDelete: SetNull)
+}
+
+model services {
+  id             Int              @id @default(autoincrement())
+  name           String
+  type           String           @default("طبخ")
+  description    String           @default("")
+  price          Decimal          @default(0) @db.Decimal(10, 2)
+  unit           String           @default("للطلب")
+  is_active      Boolean          @default(true)
+  created_at     DateTime         @default(now()) @db.Timestamptz(6)
+  order_services order_services[]
+}
+
+model sessions {
+  token      String   @id
+  user_id    Int
+  expires_at DateTime @db.Timestamptz(6)
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  users      users    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "sessions_user_id_users_id_fk")
+}
+
+model shipments {
+  id                   Int                @id @default(autoincrement())
+  order_id             Int
+  carrier_id           Int?
+  external_shipment_id String?
+  tracking_number      String?
+  tracking_url         String?
+  label_url            String?
+  status               String             @default("pending")
+  cancellation_status  String             @default("not_requested")
+  shipping_cost        Decimal?           @db.Decimal(10, 2)
+  billing_reference    String?
+  notes                String             @default("")
+  created_at           DateTime           @default(now()) @db.Timestamptz(6)
+  updated_at           DateTime           @default(now()) @db.Timestamptz(6)
+  shipping_carriers    shipping_carriers? @relation(fields: [carrier_id], references: [id], onUpdate: NoAction)
+  orders               orders             @relation(fields: [order_id], references: [id], onUpdate: NoAction)
+
+  @@index([carrier_id])
+  @@index([created_at])
+  @@index([order_id])
+  @@index([status])
+}
+
+model shipping_carriers {
+  id                     Int         @id @default(autoincrement())
+  key                    String      @unique
+  name                   String
+  api_base_url           String?
+  credentials_ciphertext String?
+  is_enabled             Boolean     @default(false)
+  show_at_checkout       Boolean     @default(false)
+  billing_mode           String      @default("carrier_account")
+  created_at             DateTime    @default(now()) @db.Timestamptz(6)
+  updated_at             DateTime    @default(now()) @db.Timestamptz(6)
+  shipments              shipments[]
+}
+
+model store_settings {
+  id                        Int      @id @default(1)
+  store_name                String   @default("أهل الكرم")
+  tagline                   String   @default("عشاك جاهز")
+  announcement              String   @default("توصيل مجاني داخل الرياض")
+  hero_title                String   @default("عشاك جاهز من أهل الكرم")
+  hero_subtitle             String   @default("")
+  hero_image_url            String?
+  background_color          String   @default("#fbf7ef")
+  background_image_url      String?
+  background_pattern        String   @default("none")
+  surface_color             String   @default("#f6efe1")
+  primary_color             String   @default("#0b3b2e")
+  accent_color              String   @default("#c9a227")
+  phone                     String   @default("+966500748221")
+  email                     String   @default("waaaa2048@gmail.com")
+  whatsapp                  String   @default("966500748221")
+  address                   String   @default("الرياض · حي الملقا")
+  working_hours             String   @default("يومياً ٩:٠٠ ص — ١٢:٠٠ م")
+  about                     String   @default("")
+  free_doc_number           String   @default("FL-621217211")
+  instagram                 String?
+  snapchat                  String?
+  tiktok                    String?
+  free_delivery             Boolean  @default(true)
+  min_order                 Decimal  @default(0) @db.Decimal(10, 2)
+  delivery_fee              Decimal  @default(0) @db.Decimal(10, 2)
+  prep_hours                Int      @default(4)
+  tax_rate                  Decimal  @default(15) @db.Decimal(5, 2)
+  cod_enabled               Boolean  @default(true)
+  apple_pay_enabled         Boolean  @default(false)
+  bank_transfer_enabled     Boolean  @default(true)
+  bank_name                 String   @default("")
+  bank_account_name         String   @default("")
+  bank_iban                 String   @default("")
+  mada_enabled              Boolean  @default(true)
+  tabby_enabled             Boolean  @default(true)
+  tamara_enabled            Boolean  @default(true)
+  show_reviews              Boolean  @default(true)
+  show_featured             Boolean  @default(true)
+  theme_preset              String   @default("store-emerald")
+  logo_url                  String?
+  favicon_url               String?
+  font_family               String   @default("Tajawal")
+  font_url                  String?
+  font_weight               String   @default("400,500,700,800")
+  use_arabic_numbers        Boolean  @default(true)
+  show_breadcrumbs          Boolean  @default(true)
+  uniform_product_heights   Boolean  @default(true)
+  auto_play_carousel        Boolean  @default(true)
+  enhanced_cart_toast       Boolean  @default(true)
+  auto_load_more            Boolean  @default(false)
+  theme_animations          Boolean  @default(true)
+  loading_page_enabled      Boolean  @default(false)
+  loader_image_url          String?
+  loader_background_color   String   @default("#ffffff")
+  loader_logo_size          Int      @default(100)
+  loader_duration           Int      @default(2)
+  loader_skip_button        Boolean  @default(true)
+  loader_all_pages          Boolean  @default(false)
+  top_bar_dark              Boolean  @default(false)
+  mobile_sidebar_dark       Boolean  @default(false)
+  footer_dark               Boolean  @default(false)
+  header_mobile_logo_right  Boolean  @default(true)
+  mobile_back_button        Boolean  @default(false)
+  enlarged_header_icons     Boolean  @default(false)
+  bottom_nav_enabled        Boolean  @default(false)
+  sidebar_background        String   @default("#ffffff")
+  hide_useful_links         Boolean  @default(false)
+  hide_customer_service     Boolean  @default(false)
+  announcement_auto_hide    Boolean  @default(false)
+  announcement_slide        Boolean  @default(false)
+  floating_announcement     Boolean  @default(false)
+  announcement_icon         String   @default("✦")
+  announcement_text_color   String   @default("#ffffff")
+  customer_channels_enabled Boolean  @default(true)
+  free_doc_visible          Boolean  @default(true)
+  store_app_visible         Boolean  @default(true)
+  product_card_background   String   @default("#ffffff")
+  product_card_border       String   @default("#e9dfcf")
+  promo_title_background    String   @default("#f87e7e")
+  product_image_ratio       Int      @default(9)
+  product_card_radius       String   @default("rounded")
+  custom_css                String   @default("")
+  product_add_icon          String   @default("plus")
+  quick_product_view        Boolean  @default(true)
+  wishlist_visible          Boolean  @default(true)
+  hide_product_frame        Boolean  @default(false)
+  hide_discount_badge       Boolean  @default(false)
+  hide_product_background   Boolean  @default(false)
+  bold_product_title        Boolean  @default(true)
+  one_line_product_title    Boolean  @default(false)
+  centered_product_text     Boolean  @default(false)
+  hide_out_of_stock_button  Boolean  @default(false)
+  hide_add_to_cart          Boolean  @default(false)
+  hide_wishlist_button      Boolean  @default(false)
+  hide_product_ratings      Boolean  @default(false)
+  hide_product_category     Boolean  @default(false)
+  shine_product_card        Boolean  @default(true)
+  homepage_sections         Json     @default("[]")
+  custom_domain             String?
+  domain_status             String   @default("none")
+  maintenance_mode          Boolean  @default(false)
+  maintenance_message       String   @default("نعتذر، المتجر مغلق مؤقتاً للصيانة.")
+  updated_at                DateTime @default(now()) @db.Timestamptz(6)
+  app_download_settings     Json     @default("{}")
+  product_animal_types      Json     @default("[\"عام\", \"خروف\", \"تيس\", \"لحم مفروم\", \"حاشي\"]")
+  moyasar_enabled           Boolean  @default(false)
+}
+
+model users {
+  id                 Int       @id @default(autoincrement())
+  name               String
+  email              String    @unique(map: "users_email_unique")
+  phone              String?
+  role               String    @default("sales")
+  permissions        Json      @default("[]")
+  allowed_categories Json      @default("[]")
+  password_hash      String
+  otpCode            String?   // تمت الإضافة لنظام الـ OTP
+  otpExpiresAt       DateTime? // تمت الإضافة لتاريخ انتهاء الـ OTP
+  created_at         DateTime  @default(now()) @db.Timestamptz(6)
+  sessions           sessions[]
+}

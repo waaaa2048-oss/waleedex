@@ -1,0 +1,21 @@
+import { NextResponse, type NextRequest } from "next/server";
+
+export function proxy(request: NextRequest) {
+  const url = request.nextUrl.clone();
+  const hadSessionToken = url.searchParams.has("session") || url.searchParams.has("csession");
+  if (hadSessionToken) {
+    url.searchParams.delete("session");
+    url.searchParams.delete("csession");
+    return NextResponse.redirect(url);
+  }
+  return NextResponse.next();
+}
+
+export const config = {
+  matcher: [
+    "/dashboard",
+    "/dashboard/:path*",
+    "/account",
+    "/api/:path*",
+  ],
+};

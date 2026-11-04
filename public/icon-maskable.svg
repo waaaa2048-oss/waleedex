@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect width="512" height="512" fill="#0b3b2e"/>
+  <circle cx="256" cy="225" r="160" fill="none" stroke="#c9a227" stroke-width="12" opacity=".4"/>
+  <path d="M166 190h180l-17 175H183l-17-175Z" fill="#c9a227"/>
+  <path d="M205 205v-32a51 51 0 0 1 102 0v32" fill="none" stroke="#f9f3e6" stroke-width="19" stroke-linecap="round"/>
+  <path d="M225 252v57M287 252v57" stroke="#0b3b2e" stroke-width="19" stroke-linecap="round"/>
+  <text x="256" y="441" font-size="34" text-anchor="middle" fill="#ffffff" font-family="sans-serif" font-weight="bold">أهل الكرم</text>
+</svg>
