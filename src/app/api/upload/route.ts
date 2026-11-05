@@ -1,6 +1,5 @@
-﻿import { NextResponse } from "next/server";
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
+import { NextResponse } from "next/server";
+import { put } from "@vercel/blob";
 
 export const dynamic = "force-dynamic";
 
@@ -13,20 +12,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "لم يتم العثور على أي ملف للرفع" }, { status: 400 });
     }
 
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
+    const fileName = `receipts/${Date.now()}-${file.name.replace(/\s+/g, "_")}`;
 
-    const uploadDir = path.join(process.cwd(), "public", "uploads");
-    await mkdir(uploadDir, { recursive: true });
-
-    const fileName = `${Date.now()}-${file.name.replace(/\s+/g, "_")}`;
-    const filePath = path.join(uploadDir, fileName);
-
-    await writeFile(filePath, buffer);
+    const blob = await put(fileName, file, { access: "private" });
 
     return NextResponse.json({
       ok: true,
-      url: `/uploads/${fileName}`,
+      url: blob.url,
     });
   } catch (error) {
     console.error("[Upload Error]", error);
