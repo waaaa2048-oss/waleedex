@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import Image from 'next/image';
 import Link from 'next/link';
@@ -111,22 +111,24 @@ export function CheckoutFlow({
     if (!file) return;
     setReceiptFile(file);
     setReceiptUploading(true);
-    const formData = new FormData();
-    formData.append('file', file);
+
     try {
-      const res = await fetch('/api/upload', { method: 'POST', body: formData });
-      const data = await res.json();
-      if (data.url) {
-        setReceiptUrl(data.url);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result as string;
+        setReceiptUrl(base64String);
         setReceiptUploaded(true);
+        setReceiptUploading(false);
         toast?.('تم رفع الإيصال بنجاح', 'success');
-      } else {
-        alert('فشل رفع الإيصال، حاول مرة أخرى');
-      }
+      };
+      reader.onerror = () => {
+        setReceiptUploading(false);
+        alert('فشل قراءة الملف، حاول مرة أخرى');
+      };
+      reader.readAsDataURL(file);
     } catch (err) {
-      alert('حدث خطأ أثناء رفع الإيصال');
-    } finally {
       setReceiptUploading(false);
+      alert('حدث خطأ أثناء معالجة الإيصال');
     }
   };
 
@@ -443,7 +445,7 @@ export function CheckoutFlow({
               <div className='pt-2 border-t border-emerald-200'>
                 <label className='block text-xs font-bold text-emerald-900 mb-1.5'>إرفاق صورة إيصال التحويل البنكي (صورة الفاتورة/الحوالة) *</label>
                 <input type='file' accept='image/*' onChange={handleUploadReceipt} className='w-full border border-emerald-300 rounded-2xl p-2.5 text-xs bg-white text-gray-700' required />
-                {receiptUploading && <p className='text-xs text-amber-700 font-bold mt-1.5'>جاري رفع صورة الإيصال...</p>}
+                {receiptUploading && <p className='text-xs text-amber-700 font-bold mt-1.5'>جاري معالجة صورة الإيصال...</p>}
                 {receiptUploaded && <p className='text-xs text-emerald-700 font-bold mt-1.5'>✓ تم رفع الإيصال بنجاح وجاهز للإرسال</p>}
               </div>
             </div>
