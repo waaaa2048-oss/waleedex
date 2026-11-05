@@ -58,7 +58,7 @@ export function CheckoutFlow({
   const [receiptFile, setReceiptFile] = useState<File | null>(null);
   const [receiptUploaded, setReceiptUploaded] = useState(false);
   const [receiptUploading, setReceiptUploading] = useState(false);
-  const [receiptUrl, setReceiptUrl] = useState(''); // هذا هو المتجر الأساسي لقيمة الـ Base64
+  const [paymentReceipt, setPaymentReceipt] = useState(''); // المتغير الموحد لقيمة الـ Base64
   const [ibanCopied, setIbanCopied] = useState(false);
   
   const [orderComplete, setOrderComplete] = useState<{ code: string; totalAmount: number } | null>(null);
@@ -109,7 +109,7 @@ export function CheckoutFlow({
     const reader = new FileReader();
     reader.onloadend = () => {
       const base64String = reader.result as string;
-      setReceiptUrl(base64String);
+      setPaymentReceipt(base64String);
       setReceiptUploaded(true);
       setReceiptUploading(false);
       toast?.('تم رفع الإيصال بنجاح', 'success');
@@ -139,7 +139,7 @@ export function CheckoutFlow({
       alert('لا توجد طريقة دفع متاحة حالياً لهذا المتجر. يرجى التواصل مع المتجر.');
       return;
     }
-    if (paymentMethod === 'transfer' && !receiptUrl) {
+    if (paymentMethod === 'transfer' && !paymentReceipt) {
       alert('يرجى رفع إيصال التحويل البنكي لإتمام الطلب');
       return;
     }
@@ -158,7 +158,7 @@ export function CheckoutFlow({
 
       const finalTimeSlot = timeSlotType === 'period' ? period : `ساعة محددة: ${customTime}`;
       const finalNotes = [
-        receiptUrl ? 'تم إرفاق إيصال التحويل بنجاح' : '',
+        paymentReceipt ? 'تم إرفاق إيصال التحويل بنجاح' : '',
         mapLink ? `رابط الموقع: ${mapLink}` : '',
         preparationNotes ? `ملاحظات الطبخ: ${preparationNotes}` : '',
         isSlaughterhouseStore ? `نوع التقطيع: ${cuttingType || 'قياسي'}` : '',
@@ -183,7 +183,7 @@ export function CheckoutFlow({
           storeSlug,
           cuttingType: cuttingType || 'قياسي',
           coldShippingAccepted,
-          paymentReceipt: receiptUrl, // إرسال الإيصال المشفّر إلى الـ API بصيغة Base64
+          paymentReceipt, // إرسال المتطابق تماماً مع الـ API
         })
       });
 
