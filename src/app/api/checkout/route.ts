@@ -12,7 +12,25 @@ export async function POST(request: Request) {
     const cookieStore = await cookies();
     const phoneFromCookie = cookieStore.get('user_phone')?.value;
     const body = await request.json().catch(() => ({}));
-    const { phone, items, paymentMethod, fulfillment, city, district, street, locationDetails, notes, deliveryDate, timeSlot, storeId, storeSlug, cuttingType, coldShippingAccepted } = body as Record<string, unknown>;
+    const { 
+      phone, 
+      items, 
+      paymentMethod, 
+      fulfillment, 
+      city, 
+      district, 
+      street, 
+      locationDetails, 
+      notes, 
+      deliveryDate, 
+      timeSlot, 
+      storeId, 
+      storeSlug, 
+      cuttingType, 
+      coldShippingAccepted,
+      paymentReceipt // استقبال إيصال التحويل البنكي بصيغة Base64
+    } = body as Record<string, unknown>;
+
     const targetPhone = typeof phoneFromCookie === 'string' ? phoneFromCookie : typeof phone === 'string' ? phone : '';
 
     if (!targetPhone) {
@@ -81,6 +99,12 @@ export async function POST(request: Request) {
     if (!enabledMethods[requestedMethod]) {
       return NextResponse.json({ error: 'طريقة الدفع المحددة غير مفعّلة لهذا المتجر.' }, { status: 400 });
     }
+
+    // التحقق من إرفاق الإيصال في حالة التحويل البنكي
+    if (requestedMethod === 'transfer' && (!paymentReceipt || typeof paymentReceipt !== 'string')) {
+      return NextResponse.json({ error: 'يرجى إرفاق إيصال التحويل البنكي لإتمام الطلب.' }, { status: 400 });
+    }
+
     if (store.storeType === 'SLAUGHTERHOUSE' && (typeof deliveryDate !== 'string' || !deliveryDate.trim())) {
       return NextResponse.json({ error: 'يرجى اختيار تاريخ الاستلام للذبائح.' }, { status: 400 });
     }
@@ -182,6 +206,7 @@ export async function POST(request: Request) {
       : '';
     const finalNotes = [deliveryInfo, cuttingInfo, frozenInfo, typeof notes === 'string' ? notes : ''].filter(Boolean).join(' | ');
 
+    // إدخال الطلب وتخزين إيصال التحويل البنكي في قاعدة البيانات
     const [newOrder] = await db
       .insert(orders)
       .values({
@@ -194,6 +219,7 @@ export async function POST(request: Request) {
         deliveryAddress: fullAddress,
         deliveryFee: '0',
         paymentMethod: requestedMethod,
+        paymentReceipt: typeof paymentReceipt === 'string' ? paymentReceipt : null,
         notes: finalNotes,
         totalAmount: String(calculatedTotal),
         paidAmount: '0',
