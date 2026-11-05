@@ -13,7 +13,7 @@ export default function AvatarUploadPage() {
         onSubmit={async (event) => {
           event.preventDefault();
 
-          const file = inputFileRef.current.files.[0];
+          const file = inputFileRef.current.files[0];
 
           const response = await fetch(
             `/api/avatar/upload?filename=${file.name}`,
