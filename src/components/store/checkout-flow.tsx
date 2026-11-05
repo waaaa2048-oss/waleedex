@@ -33,13 +33,9 @@ export function CheckoutFlow({
   const subtotal = lines.reduce((sum, line) => sum + line.price * line.quantity, 0);
   const { toast } = useToast();
   
-  // خيارات الاستلام (توصيل أو استلام من الفرع)
   const [fulfillment, setFulfillment] = useState<'delivery' | 'pickup'>('delivery');
-  
-  // طريقة إدخال الموقع (تلقائي عبر الـ GPS أو يدوي)
   const [locationType, setLocationType] = useState<'gps' | 'manual'>('gps');
   
-  // حقول العنوان التفصيلي
   const [city, setCity] = useState('الرياض');
   const [district, setDistrict] = useState('');
   const [street, setStreet] = useState('');
@@ -47,7 +43,6 @@ export function CheckoutFlow({
   const [mapLink, setMapLink] = useState('');
   const [locationLoading, setLocationLoading] = useState(false);
 
-  // موعد الاستلام والتوقيت
   const [deliveryDate, setDeliveryDate] = useState('');
   const [timeSlotType, setTimeSlotType] = useState<'period' | 'custom'>('period');
   const [period, setPeriod] = useState('مساءً (٤:٠٠ م - ٨:٠٠ م)');
@@ -59,11 +54,11 @@ export function CheckoutFlow({
   const [paymentMethod, setPaymentMethod] = useState(paymentOptions[0]?.value ?? '');
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   
-  // إدارة إيصال التحويل البنكي
+  // إدارة إيصال التحويل البنكي محلياً بصيغة Base64
   const [receiptFile, setReceiptFile] = useState<File | null>(null);
   const [receiptUploaded, setReceiptUploaded] = useState(false);
   const [receiptUploading, setReceiptUploading] = useState(false);
-  const [receiptUrl, setReceiptUrl] = useState('');
+  const [receiptUrl, setReceiptUrl] = useState(''); // هذا هو المتجر الأساسي لقيمة الـ Base64
   const [ibanCopied, setIbanCopied] = useState(false);
   
   const [orderComplete, setOrderComplete] = useState<{ code: string; totalAmount: number } | null>(null);
@@ -75,7 +70,6 @@ export function CheckoutFlow({
   const deliveryFee = fulfillment === 'delivery' && deliveryOption ? getCheckoutDeliveryFee(deliveryOption) : 0;
   const total = subtotal + deliveryFee;
 
-  // جلب الموقع الحالي عبر GPS وتوليد رابط قوقل ماب
   const handleGetLocation = () => {
     if (!navigator.geolocation) {
       alert('المتصفح لا يدعم تحديد الموقع الجغرافي');
@@ -106,30 +100,25 @@ export function CheckoutFlow({
     toast?.('تم نسخ رقم الإيبان بنجاح', 'success');
   };
 
-  const handleUploadReceipt = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleUploadReceipt = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     setReceiptFile(file);
     setReceiptUploading(true);
 
-    try {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const base64String = reader.result as string;
-        setReceiptUrl(base64String);
-        setReceiptUploaded(true);
-        setReceiptUploading(false);
-        toast?.('تم رفع الإيصال بنجاح', 'success');
-      };
-      reader.onerror = () => {
-        setReceiptUploading(false);
-        alert('فشل قراءة الملف، حاول مرة أخرى');
-      };
-      reader.readAsDataURL(file);
-    } catch (err) {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64String = reader.result as string;
+      setReceiptUrl(base64String);
+      setReceiptUploaded(true);
       setReceiptUploading(false);
-      alert('حدث خطأ أثناء معالجة الإيصال');
-    }
+      toast?.('تم رفع الإيصال بنجاح', 'success');
+    };
+    reader.onerror = () => {
+      setReceiptUploading(false);
+      alert('فشل قراءة الملف، حاول مرة أخرى');
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleSubmitOrder = async (e: React.FormEvent) => {
@@ -169,7 +158,7 @@ export function CheckoutFlow({
 
       const finalTimeSlot = timeSlotType === 'period' ? period : `ساعة محددة: ${customTime}`;
       const finalNotes = [
-        receiptUrl ? `تم إرفاق إيصال التحويل بنجاح (${receiptUrl})` : '',
+        receiptUrl ? 'تم إرفاق إيصال التحويل بنجاح' : '',
         mapLink ? `رابط الموقع: ${mapLink}` : '',
         preparationNotes ? `ملاحظات الطبخ: ${preparationNotes}` : '',
         isSlaughterhouseStore ? `نوع التقطيع: ${cuttingType || 'قياسي'}` : '',
@@ -194,6 +183,7 @@ export function CheckoutFlow({
           storeSlug,
           cuttingType: cuttingType || 'قياسي',
           coldShippingAccepted,
+          paymentReceipt: receiptUrl, // إرسال الإيصال المشفّر إلى الـ API بصيغة Base64
         })
       });
 
@@ -310,7 +300,6 @@ export function CheckoutFlow({
 
           {fulfillment === 'delivery' && (
             <div className='space-y-4 pt-2'>
-              {/* اختيار طريقة إدخال الموقع */}
               <div className='flex gap-3 bg-gray-50 p-2 rounded-2xl border border-gray-100'>
                 <button type='button' onClick={() => setLocationType('gps')} className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition ${locationType === 'gps' ? 'bg-emerald-600 text-white shadow-sm' : 'text-gray-600 hover:bg-gray-200/50'}`}>
                   📍 تحديد الموقع التلقائي (GPS)
