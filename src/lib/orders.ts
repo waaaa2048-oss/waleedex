@@ -71,6 +71,7 @@ export function parseOrderPayload(body: unknown): ParseResult<OrderInput> {
   const fulfillment = asText(payload.fulfillment) === "pickup" ? "pickup" : "delivery";
   const paidAmount = Math.max(0, asNumber(payload.paidAmount) ?? 0);
   const deliveryFee = Math.max(0, asNumber(payload.deliveryFee) ?? 0);
+  const paymentReceipt = asOptionalText(payload.paymentReceipt);
 
   return {
     ok: true,
@@ -84,6 +85,7 @@ export function parseOrderPayload(body: unknown): ParseResult<OrderInput> {
       notes: asOptionalText(payload.notes),
       paymentMethod: asText(payload.paymentMethod) || "cash",
       paidAmount,
+      paymentReceipt,
       items,
       services: serviceLines,
     },
@@ -214,6 +216,7 @@ export async function createOrder(input: OrderInput): Promise<OrderDTO> {
         totalAmount: String(total),
         paidAmount: String(Math.min(input.paidAmount ?? 0, total)),
         paymentMethod: input.paymentMethod ?? "cash",
+        paymentReceipt: input.paymentReceipt ?? null,
       })
       .returning({ id: orders.id });
 
@@ -264,7 +267,6 @@ export async function updateOrder(id: number, payload: OrderUpdatePayload): Prom
   const isPickup = payload.fulfillment === "pickup";
   const deliveryFeeChanged = payload.deliveryFee !== undefined || isPickup;
 
-  // Compute the order's resulting total up-front (needed to clamp paidAmount).
   let newTotal: number;
   if (computed) {
     newTotal = round2(computed.total + deliveryFee);
@@ -289,12 +291,14 @@ export async function updateOrder(id: number, payload: OrderUpdatePayload): Prom
     if (payload.paymentMethod && payload.paymentMethod in PAYMENT_METHODS) {
       values.paymentMethod = payload.paymentMethod;
     }
+    if (payload.paymentReceipt !== undefined) {
+      values.paymentReceipt = payload.paymentReceipt;
+    }
 
     if (computed || deliveryFeeChanged) {
       values.totalAmount = String(newTotal);
     }
 
-    // Always clamp paidAmount to newTotal.
     if (typeof payload.paidAmount === "number") {
       values.paidAmount = String(Math.max(0, Math.min(payload.paidAmount, newTotal)));
     } else if (computed || deliveryFeeChanged) {
