@@ -106,10 +106,10 @@ export async function POST(request: Request) {
       `مرحباً بك يا ${customerName} 👋\n\n` +
       `شكراً لتسوقك في *أهل الكرم للذبايح* 🐑\n\n` +
       `📦 *تفاصيل طلبك المؤكد:* \n` +
-      `- رقم الطلب: ${order.code}\n` +
-      `- الإجمالي: ${order.totalAmount} ر.س\n` +
-      `- طريقة الدفع: ${order.paymentMethod === 'transfer' ? 'تحويل بنكي' : 'الدفع عند الاستلام'}\n` +
-      `- موعد الاستلام: ${order.notes || 'حسب الاتفاق'}\n\n` +
+      `رقم الطلب: ${order.code}\n` +
+      `الإجمالي: ${order.totalAmount} ر.س\n` +
+      `طريقة الدفع: ${order.paymentMethod === 'transfer' ? 'تحويل بنكي' : 'الدفع عند الاستلام'}\n` +
+      `موعد الاستلام: ${order.notes || 'حسب الاتفاق'}\n\n` +
       `نسعد خدمتكم دائماً وسنتواصل معكم قريباً!`
     );
 
