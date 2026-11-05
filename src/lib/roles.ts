@@ -2,9 +2,8 @@
  * roles.ts
  * ─────────────────────────────────────────────
  * التعديلات في هذا الإصدار:
- *   1. استخدام Object.hasOwn بدل "in" لمنع crash عند حقن دور شاذ
- *      (مثل "toString" أو "constructor").
- *   2. باقي الأدوار والصلاحيات بدون تغيير.
+ *   1. دعم دور المالك (owner / OWNER) بجانب (admin / ADMIN) ليعطي صلاحيات كاملة.
+ *   2. استخدام Object.hasOwn لمنع الـ crash.
  */
 
 export const ROLE_PRESETS = [
@@ -60,19 +59,24 @@ const ROLE_DEFAULTS: Record<EmployeeRole, string[]> = {
 };
 
 export function defaultPermissions(role: string): string[] {
-  if (role === "staff") return ROLE_DEFAULTS.sales;
-  return Object.hasOwn(ROLE_DEFAULTS, role)
-    ? ROLE_DEFAULTS[role as EmployeeRole]
+  const lowerRole = role?.toLowerCase();
+  if (lowerRole === "admin" || lowerRole === "owner") return ROLE_DEFAULTS.admin;
+  if (lowerRole === "staff") return ROLE_DEFAULTS.sales;
+  return Object.hasOwn(ROLE_DEFAULTS, lowerRole)
+    ? ROLE_DEFAULTS[lowerRole as EmployeeRole]
     : ROLE_DEFAULTS.sales;
 }
 
 export function roleLabel(role: string): string {
-  if (role === "staff") return "موظف";
-  return ROLE_PRESETS.find((item) => item.value === role)?.label ?? "موظف";
+  const lowerRole = role?.toLowerCase();
+  if (lowerRole === "admin" || lowerRole === "owner") return "مدير عام / مالك";
+  if (lowerRole === "staff") return "موظف";
+  return ROLE_PRESETS.find((item) => item.value === lowerRole)?.label ?? "موظف";
 }
 
 export function roleCan(role: string, permissions: string[] | null | undefined, permission: string): boolean {
-  if (role === "admin") return true;
+  const lowerRole = role?.toLowerCase();
+  if (lowerRole === "admin" || lowerRole === "owner") return true;
   const effective = permissions?.length ? permissions : defaultPermissions(role);
   if (permission === "shipping.read" && effective.includes("shipping.write")) return true;
   return effective.includes(permission) && !effective.includes("__none__");
