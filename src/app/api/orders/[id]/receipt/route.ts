@@ -1,37 +1,82 @@
-﻿import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-import { prisma } from '@/lib/prisma';
-import { writeFile } from 'fs/promises';
-import path from 'path';
+﻿import { NextResponse } from "next/server";
+import { eq } from "drizzle-orm";
+import { db } from "@/db";
+import { orders } from "@/db/schema";
+import { permissionGuard } from "@/lib/api";
+import { getCurrentCustomer } from "@/lib/customer-auth";
+import {
+  PaymentReceiptValidationError,
+  createPaymentReceiptSignedUrl,
+  savePaymentReceipt,
+} from "@/lib/payment-receipts";
 
-export async function POST(request: Request, context: { params: Promise<{ id: string }> }) {
+export const dynamic = "force-dynamic";
+
+type Context = { params: Promise<{ id: string }> };
+
+/** رفع/استبدال إيصال التحويل: للعميل صاحب الطلب فقط، ويُخزَّن في تخزين خاص (ليس public). */
+export async function POST(request: Request, { params }: Context) {
+  const customer = await getCurrentCustomer();
+  if (!customer) {
+    return NextResponse.json({ error: "سجّل الدخول بحساب العميل أولاً" }, { status: 401 });
+  }
+
+  const orderId = Number((await params).id);
+  if (!Number.isInteger(orderId) || orderId <= 0) {
+    return NextResponse.json({ error: "معرّف الطلب غير صالح" }, { status: 400 });
+  }
+
   try {
-    const { id } = await context.params;
-    const orderId = Number(id);
-    const cookieStore = await cookies();
-    const phone = cookieStore.get('user_phone')?.value;
-    if (!phone) return NextResponse.json({ error: 'سجّل الدخول بحساب العميل أولاً' }, { status: 401 });
-    const customer = await prisma.customers.findFirst({ where: { phone } });
-    if (!customer) return NextResponse.json({ error: 'حساب العميل غير موجود' }, { status: 404 });
-    const order = await prisma.orders.findUnique({ where: { id: orderId } });
-    if (!order || order.customer_id !== customer.id) return NextResponse.json({ error: 'الطلب غير موجود أو لا يخص هذا الحساب' }, { status: 403 });
-    const formData = await request.formData();
-    const file = formData.get('receipt') as File;
-    if (!file) return NextResponse.json({ error: 'لم يتم إرفاق أي ملف' }, { status: 400 });
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-    const ext = path.extname(file.name) || '.jpg';
-    const filename = 'receipt-' + orderId + '-' + Date.now() + ext;
-    const uploadDir = path.join(process.cwd(), 'public', 'uploads');
-    try { await import('fs/promises').then(fs => fs.mkdir(uploadDir, { recursive: true })); } catch (e) {}
-    const filepath = path.join(uploadDir, filename);
-    await writeFile(filepath, buffer);
-    const receiptUrl = '/uploads/' + filename;
-    const updatedNotes = (order.notes || '') + ' | تم إرفاق إيصال التحويل بنجاح (' + receiptUrl + ')';
-    await prisma.orders.update({ where: { id: orderId }, data: { notes: updatedNotes.trim() } });
-    return NextResponse.json({ success: true, receiptUrl });
-  } catch (error: any) {
-    console.error('Error uploading receipt:', error);
-    return NextResponse.json({ error: 'حدث خطأ أثناء رفع الإيصال' }, { status: 500 });
+    const [order] = await db
+      .select({ id: orders.id, customerId: orders.customerId })
+      .from(orders)
+      .where(eq(orders.id, orderId))
+      .limit(1);
+    if (!order || order.customerId !== customer.id) {
+      return NextResponse.json({ error: "الطلب غير موجود أو لا يخص هذا الحساب" }, { status: 404 });
+    }
+
+    const form = await request.formData().catch(() => null);
+    const file = form?.get("receipt");
+    if (!(file instanceof File)) {
+      return NextResponse.json({ error: "لم يتم إرفاق أي ملف" }, { status: 400 });
+    }
+
+    const path = await savePaymentReceipt(orderId, file);
+    await db.update(orders).set({ paymentReceiptPath: path }).where(eq(orders.id, orderId));
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    if (error instanceof PaymentReceiptValidationError) {
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
+    console.error("[order-receipt] upload failed:", error instanceof Error ? error.message : error);
+    return NextResponse.json({ error: "حدث خطأ أثناء رفع الإيصال" }, { status: 500 });
+  }
+}
+
+/** عرض الإيصال للموظفين المخوّلين عبر رابط موقّع قصير العمر (يستخدمه زر "عرض إيصال التحويل"). */
+export async function GET(_request: Request, { params }: Context) {
+  const denied = await permissionGuard("orders.read");
+  if (denied) return denied;
+
+  const orderId = Number((await params).id);
+  if (!Number.isInteger(orderId) || orderId <= 0) {
+    return NextResponse.json({ error: "معرّف الطلب غير صالح" }, { status: 400 });
+  }
+
+  try {
+    const [order] = await db
+      .select({ path: orders.paymentReceiptPath })
+      .from(orders)
+      .where(eq(orders.id, orderId))
+      .limit(1);
+    if (!order?.path) {
+      return NextResponse.json({ error: "لا يوجد إيصال لهذا الطلب" }, { status: 404 });
+    }
+    const signedUrl = await createPaymentReceiptSignedUrl(order.path);
+    return NextResponse.redirect(signedUrl, 302);
+  } catch (error) {
+    console.error("[order-receipt] view failed:", error instanceof Error ? error.message : error);
+    return NextResponse.json({ error: "تعذر عرض الإيصال" }, { status: 500 });
   }
 }

@@ -216,7 +216,6 @@ export async function createOrder(input: OrderInput): Promise<OrderDTO> {
         totalAmount: String(total),
         paidAmount: String(Math.min(input.paidAmount ?? 0, total)),
         paymentMethod: input.paymentMethod ?? "cash",
-        paymentReceipt: input.paymentReceipt ?? null,
       })
       .returning({ id: orders.id });
 
@@ -290,9 +289,6 @@ export async function updateOrder(id: number, payload: OrderUpdatePayload): Prom
     if (payload.notes !== undefined) values.notes = payload.notes;
     if (payload.paymentMethod && payload.paymentMethod in PAYMENT_METHODS) {
       values.paymentMethod = payload.paymentMethod;
-    }
-    if (payload.paymentReceipt !== undefined) {
-      values.paymentReceipt = payload.paymentReceipt;
     }
 
     if (computed || deliveryFeeChanged) {

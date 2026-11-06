@@ -39,6 +39,7 @@ export default function AccountClientView({
   };
 
   const handleLogout = async () => {
+    await fetch('/api/customer/logout', { method: 'POST' }).catch(() => null);
     document.cookie = 'user_phone=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
     window.location.href = `/${storeSlug}/customer/login`;
   };

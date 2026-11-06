@@ -1,19 +1,28 @@
 import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
+import { getCurrentCustomer } from '@/lib/customer-auth';
+import { savePaymentReceipt } from '@/lib/payment-receipts';
 import { eq, inArray } from 'drizzle-orm';
 import { db } from '@/db';
-import { customers, orderItems, orders, productModifiers, products, stores } from '@/db/schema';
+import { orderItems, orders, productModifiers, products, stores } from '@/db/schema';
 import { getGlobalPaymentMethods } from '@/lib/payment-methods';
 import { getStoreSettings } from '@/lib/admin-data';
 import { getPaymentCredentialStatus } from '@/lib/payment-credentials';
 
+const RECEIPT_DATA_URL = /^data:(image\/(?:jpeg|png|webp)|application\/pdf);base64,([A-Za-z0-9+/=]+)$/;
+
+/** يحوّل إيصال Data URL القادم من المتصفح إلى ملف بعد فحص النوع والحجم (حد أقصى تقريبي 5MB). */
+function receiptFileFromDataUrl(value: unknown): File | null {
+  if (typeof value !== 'string' || value.length > 7_500_000) return null;
+  const match = RECEIPT_DATA_URL.exec(value);
+  if (!match) return null;
+  const bytes = new Uint8Array(Buffer.from(match[2], 'base64'));
+  return new File([bytes], 'receipt', { type: match[1] });
+}
+
 export async function POST(request: Request) {
   try {
-    const cookieStore = await cookies();
-    const phoneFromCookie = cookieStore.get('user_phone')?.value;
     const body = await request.json().catch(() => ({}));
     const { 
-      phone, 
       items, 
       paymentMethod, 
       fulfillment, 
@@ -31,15 +40,10 @@ export async function POST(request: Request) {
       paymentReceipt // استقبال إيصال التحويل البنكي بصيغة Base64
     } = body as Record<string, unknown>;
 
-    const targetPhone = typeof phoneFromCookie === 'string' ? phoneFromCookie : typeof phone === 'string' ? phone : '';
-
-    if (!targetPhone) {
-      return NextResponse.json({ error: 'يلزم تسجيل الدخول لإتمام الطلب' }, { status: 401 });
-    }
-
-    const [customer] = await db.select().from(customers).where(eq(customers.phone, targetPhone)).limit(1);
+    // الهوية من جلسة الخادم فقط. لا نقبل رقم الجوال من الكوكي أو من جسم الطلب.
+    const customer = await getCurrentCustomer();
     if (!customer) {
-      return NextResponse.json({ error: 'حساب العميل غير موجود' }, { status: 404 });
+      return NextResponse.json({ error: 'يلزم تسجيل الدخول لإتمام الطلب' }, { status: 401 });
     }
 
     const addressParts = [`المدينة: ${typeof city === 'string' ? city : 'الرياض'}`];
@@ -103,6 +107,11 @@ export async function POST(request: Request) {
     // التحقق من إرفاق الإيصال في حالة التحويل البنكي
     if (requestedMethod === 'transfer' && (!paymentReceipt || typeof paymentReceipt !== 'string')) {
       return NextResponse.json({ error: 'يرجى إرفاق إيصال التحويل البنكي لإتمام الطلب.' }, { status: 400 });
+    }
+
+    const receiptFile = requestedMethod === 'transfer' ? receiptFileFromDataUrl(paymentReceipt) : null;
+    if (requestedMethod === 'transfer' && !receiptFile) {
+      return NextResponse.json({ error: 'صيغة الإيصال غير صالحة. ارفع JPG أو PNG أو WEBP أو PDF بحجم أقصاه 5 ميجابايت.' }, { status: 400 });
     }
 
     if (store.storeType === 'SLAUGHTERHOUSE' && (typeof deliveryDate !== 'string' || !deliveryDate.trim())) {
@@ -219,7 +228,6 @@ export async function POST(request: Request) {
         deliveryAddress: fullAddress,
         deliveryFee: '0',
         paymentMethod: requestedMethod,
-        paymentReceipt: typeof paymentReceipt === 'string' ? paymentReceipt : null,
         notes: finalNotes,
         totalAmount: String(calculatedTotal),
         paidAmount: '0',
@@ -241,8 +249,22 @@ export async function POST(request: Request) {
       );
     }
 
+    // حفظ إيصال التحويل في تخزين خاص (وليس Base64 داخل قاعدة البيانات).
+    // فشل الحفظ لا يلغي الطلب: يمكن للعميل إعادة الرفع من صفحة حسابه.
+    let receiptSaved = true;
+    if (receiptFile) {
+      try {
+        const receiptPath = await savePaymentReceipt(newOrder.id, receiptFile);
+        await db.update(orders).set({ paymentReceiptPath: receiptPath }).where(eq(orders.id, newOrder.id));
+      } catch (receiptError) {
+        receiptSaved = false;
+        console.error('[checkout] receipt save failed:', receiptError instanceof Error ? receiptError.message : receiptError);
+      }
+    }
+
     return NextResponse.json({
       success: true,
+      receiptSaved,
       order: { id: newOrder.id, code: newOrder.code, totalAmount: calculatedTotal },
     });
   } catch (error: unknown) {

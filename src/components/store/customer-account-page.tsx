@@ -1,8 +1,8 @@
-import { cookies } from "next/headers";
+import { getCurrentCustomer } from "@/lib/customer-auth";
 import { redirect } from "next/navigation";
 import { and, eq } from "drizzle-orm";
 import { db } from "@/db";
-import { customers, orders } from "@/db/schema";
+import { orders } from "@/db/schema";
 import AccountClientView from "@/app/(store)/account/AccountClientView";
 
 export async function CustomerAccountPage({
@@ -14,31 +14,23 @@ export async function CustomerAccountPage({
   storeName: string;
   storeSlug: string;
 }) {
-  const cookieStore = await cookies();
-  const phone = cookieStore.get("user_phone")?.value;
   const storeBasePath = `/${storeSlug}`;
 
-  if (!phone) redirect(`${storeBasePath}/customer/login`);
+  // الهوية من جلسة الخادم فقط، لا من كوكي الجوال.
+  const customer = await getCurrentCustomer();
+  if (!customer) redirect(`${storeBasePath}/customer/login`);
 
-  const [customer] = await db
+  const rawOrders = await db
     .select()
-    .from(customers)
-    .where(eq(customers.phone, phone))
-    .limit(1);
-
-  const rawOrders = customer
-    ? await db
-        .select()
-        .from(orders)
-        .where(and(eq(orders.customerId, customer.id), eq(orders.storeId, storeId)))
-        .orderBy(orders.createdAt)
-    : [];
+    .from(orders)
+    .where(and(eq(orders.customerId, customer.id), eq(orders.storeId, storeId)))
+    .orderBy(orders.createdAt);
 
   const customerData = JSON.parse(
     JSON.stringify({
-      name: customer?.name || "عميل",
-      phone,
-      email: customer?.email || "",
+      name: customer.name || "عميل",
+      phone: customer.phone,
+      email: customer.email || "",
       orders: rawOrders,
     }),
   );

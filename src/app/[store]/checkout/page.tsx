@@ -1,4 +1,4 @@
-import { cookies } from "next/headers";
+import { getCurrentCustomer } from "@/lib/customer-auth";
 import { redirect } from "next/navigation";
 import { notFound } from "next/navigation";
 import { CheckoutFlow } from "@/components/store/checkout-flow";
@@ -24,13 +24,12 @@ export default async function StoreCheckoutPage({
   const [store] = await db.select().from(stores).where(eq(stores.slug, storeSlug.toLowerCase())).limit(1);
   if (!store || store.status !== "PUBLISHED") notFound();
 
-  const cookieStore = await cookies();
-  const phone = cookieStore.get("user_phone")?.value;
-  if (!phone) {
+  const sessionCustomer = await getCurrentCustomer();
+  if (!sessionCustomer) {
     redirect(`/${store.slug}/customer/login?next=/${store.slug}/checkout`);
   }
 
-  const customer = await prisma.customers.findFirst({ where: { phone } });
+  const customer = await prisma.customers.findUnique({ where: { id: sessionCustomer.id } });
   if (!customer) {
     redirect(`/${store.slug}/customer/login?next=/${store.slug}/checkout`);
   }

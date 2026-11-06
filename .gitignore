@@ -1,1 +1,33 @@
+# dependencies
 node_modules
+
+# next.js
+.next
+out
+next-env.d.ts
+tsconfig.tsbuildinfo
+
+# أسرار: لا ترفع أي ملف .env أبداً (ما عدا المثال)
+.env
+.env.*
+!.env.example
+
+# سجلات وملفات مؤقتة
+*.log
+all.txt
+headers.txt
+page.html
+*.bak
+*.original
+
+# مخرجات البناء
+release/
+android/build
+android/app/build
+android/.gradle
+
+# ملفات يرفعها العملاء/المدير أثناء التشغيل (إيصالات وغيرها) — لا تُرفع للمستودع
+public/uploads/receipt-*
+
+# vercel
+.vercel

@@ -61,7 +61,8 @@ export function StoreHeader({
   });
   const accountMenuRef = useRef<HTMLDivElement>(null);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await fetch("/api/customer/logout", { method: "POST" }).catch(() => null);
     document.cookie = "user_phone=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     window.location.href = storeSlug ? `/${storeSlug}` : "/";
   };

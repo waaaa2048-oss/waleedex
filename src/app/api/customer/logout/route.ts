@@ -7,5 +7,7 @@ export async function POST(request: NextRequest) {
   if (token) await deleteCustomerSession(token).catch(() => null);
   const response = NextResponse.json({ ok: true });
   response.cookies.set(CUSTOMER_COOKIE, "", clearedCookieOptions(request));
+  // كوكي العرض فقط في الواجهة
+  response.cookies.set("user_phone", "", { path: "/", maxAge: 0 });
   return response;
 }
