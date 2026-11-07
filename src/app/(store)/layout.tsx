@@ -12,7 +12,8 @@ import { ensureSeeded } from "@/db/seed";
 import { db } from "@/db";
 import { stores } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import { STORE_THEMES } from "@/lib/theme-config";
+import { STORE_THEMES, withModernDefaults } from "@/lib/theme-config";
+import { Icon, type IconName } from "@/components/icons";
 import { isTabbyConfigured } from "@/lib/tabby";
 import { getPaymentCredentials } from "@/lib/payment-credentials";
 import type { Metadata } from "next";
@@ -70,19 +71,16 @@ export default async function StoreLayout({
     getPaymentCredentials(),
   ]);
   const categories = allCategories.filter((category) => category.isActive);
-  const displaySettings = {
+  const displaySettings = withModernDefaults({
     ...baseSettings,
     storeName: storeName ?? resolvedStore.name,
     logoUrl: logoUrl ?? baseSettings.logoUrl,
-  };
+  });
+  const isDarkTheme = displaySettings.themePreset === "store-dark";
   const settings = displaySettings;
   const preset = STORE_THEMES.find((theme) => theme.id === displaySettings.themePreset) ?? STORE_THEMES[0];
   const pattern = displaySettings.backgroundPattern;
-  const storeTexture = [
-    "radial-gradient(ellipse at 92% 2%, rgba(212,163,89,0.09), transparent 34rem)",
-    "radial-gradient(ellipse at 4% 48%, rgba(107,62,38,0.035), transparent 28rem)",
-    "repeating-linear-gradient(135deg, transparent 0 34px, rgba(44,37,35,0.012) 34px 35px)",
-  ];
+  const storeTexture: string[] = [];
   const backgroundLayers = [
     displaySettings.backgroundImageUrl ? `url("${displaySettings.backgroundImageUrl}")` : "",
     pattern !== "none" ? PATTERN_STYLES[pattern] ?? "" : "",
@@ -97,10 +95,14 @@ export default async function StoreLayout({
     "--store-card": displaySettings.productCardBackground,
     "--store-line": displaySettings.productCardBorder,
     "--store-card-border": displaySettings.productCardBorder,
-    "--store-card-radius": displaySettings.productCardRadius === "square" ? "0.25rem" : displaySettings.productCardRadius === "round" ? "1.75rem" : "1rem",
+    "--store-card-radius": displaySettings.productCardRadius === "square" ? "0.375rem" : displaySettings.productCardRadius === "round" ? "1.5rem" : "0.875rem",
     "--store-product-ratio": String(displaySettings.productImageRatio),
     "--store-product-aspect": displaySettings.productImageRatio <= 9 ? "1 / 1" : `9 / ${displaySettings.productImageRatio}`,
     "--store-ink": preset.colors.dark,
+    "--store-body": isDarkTheme ? "#dcdcdc" : "#3b4640",
+    "--store-muted": isDarkTheme ? "#c7c7c7" : "#5e6a64",
+    "--store-faint": isDarkTheme ? "#a8a8a8" : "#7c8780",
+    "--store-accent-text": isDarkTheme ? displaySettings.accentColor : "#8a6212",
     "--store-font-weight": displaySettings.fontWeight,
     "--store-announcement-text": displaySettings.announcementTextColor,
     "--store-font": `"${displaySettings.fontFamily}", Tajawal, ui-sans-serif, system-ui, sans-serif`,
@@ -181,7 +183,7 @@ export default async function StoreLayout({
           {settings.floatingAnnouncement ? (
             <Link
               href={`${resolvedStoreSlug ? `/${resolvedStoreSlug}` : ""}/products`}
-              className="fixed inset-x-3 bottom-4 z-30 mx-auto flex max-w-xl items-center justify-center gap-2 rounded-2xl px-4 py-3 text-center text-[11px] font-extrabold shadow-xl md:bottom-5"
+              className="fixed inset-x-3 bottom-4 z-30 mx-auto flex max-w-xl items-center justify-center gap-2 rounded-2xl px-4 py-3 text-center text-[12px] font-semibold shadow-xl md:bottom-5"
               style={{ backgroundColor: settings.primaryColor, color: settings.announcementTextColor }}
             >
               <span>{settings.announcementIcon}</span>{settings.announcement}
@@ -189,7 +191,7 @@ export default async function StoreLayout({
           ) : null}
           <main className="relative">
             {settings.maintenanceMode ? (
-              <div className="border-b border-amber-300 bg-amber-100 px-4 py-2.5 text-center text-[11px] font-extrabold text-amber-900">
+              <div className="border-b border-amber-300 bg-amber-100 px-4 py-2.5 text-center text-[12px] font-semibold text-amber-900">
                 🛠️ {settings.maintenanceMessage}
               </div>
             ) : null}
@@ -223,9 +225,9 @@ export default async function StoreLayout({
             footerDark={settings.footerDark}
           />
           {settings.bottomNavEnabled ? (
-            <nav className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-4 border-t border-[var(--store-line)] bg-[var(--store-card)]/95 px-2 py-2 text-center text-[9px] font-bold text-[var(--store-primary)] shadow-xl backdrop-blur md:hidden">
+            <nav className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-4 border-t border-[var(--store-line)] bg-[var(--store-card)]/95 px-2 py-2 text-center text-[11px] font-bold text-[var(--store-primary)] shadow-xl backdrop-blur md:hidden">
               {[{ href: resolvedStoreSlug ? `/${resolvedStoreSlug}` : "/", label: "الرئيسية", icon: "dashboard" }, { href: `${resolvedStoreSlug ? `/${resolvedStoreSlug}` : ""}/products`, label: "المنتجات", icon: "products" }, { href: `tel:${settings.phone}`, label: "تواصل", icon: "phone" }, { href: `${resolvedStoreSlug ? `/${resolvedStoreSlug}` : ""}/products`, label: "التصنيفات", icon: "box" }].map((item) => (
-                <a key={item.label} href={item.href} className="flex flex-col items-center gap-1 py-1"><span className="grid h-6 w-6 place-items-center"><span className="text-base">{item.icon === "dashboard" ? "⌂" : item.icon === "products" ? "♨" : item.icon === "phone" ? "☎" : "▦"}</span></span>{item.label}</a>
+                <a key={item.label} href={item.href} className="flex flex-col items-center gap-1 py-1"><Icon name={item.icon as IconName} className="h-5 w-5" />{item.label}</a>
               ))}
             </nav>
           ) : null}

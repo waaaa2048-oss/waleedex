@@ -33,6 +33,12 @@
     scroll-behavior: smooth;
   }
 
+  /* تركيز ظاهر للتنقل بلوحة المفاتيح (بدون تأثير على النقر بالماوس) */
+  :where(a, button, input, select, textarea, summary):focus-visible {
+    outline: 2px solid var(--store-primary, #12503a);
+    outline-offset: 2px;
+  }
+
   body {
     background-color: var(--color-cream);
     color: var(--color-ink-800);
@@ -129,7 +135,7 @@
     animation: pop 0.25s cubic-bezier(0.22, 1, 0.36, 1) both;
   }
   .animate-shimmer {
-    background: linear-gradient(90deg, #efeae2 25%, #f7f3ec 50%, #efeae2 75%);
+    background: linear-gradient(90deg, #eceeed 25%, #f6f7f6 50%, #eceeed 75%);
     background-size: 200% 100%;
     animation: shimmer 1.4s infinite linear;
   }
@@ -182,30 +188,19 @@
 }
 
 .theme-home {
-  background:
-    radial-gradient(ellipse at 5% 12%, rgba(212, 163, 89, 0.09), transparent 28rem),
-    radial-gradient(ellipse at 96% 46%, rgba(107, 62, 38, 0.035), transparent 32rem);
+  background: none;
 }
 
 .store-hero {
-  background:
-    radial-gradient(ellipse at 12% 15%, rgba(212, 163, 89, 0.14), transparent 24rem),
-    linear-gradient(135deg, rgba(248, 245, 240, 0.92), rgba(253, 251, 247, 0.62));
+  background: transparent;
 }
 
 .store-hero-ornament {
-  background-image: radial-gradient(rgba(133, 95, 43, 0.17) 1px, transparent 1px);
-  background-position: center;
-  background-size: 22px 22px;
-  mask-image: linear-gradient(120deg, black, transparent 75%);
+  display: none;
 }
 
 .store-hero-pattern {
-  background-image:
-    linear-gradient(45deg, transparent 46%, rgba(255, 255, 255, 0.2) 47%, rgba(255, 255, 255, 0.2) 49%, transparent 50%),
-    linear-gradient(-45deg, transparent 46%, rgba(255, 255, 255, 0.14) 47%, rgba(255, 255, 255, 0.14) 49%, transparent 50%);
-  background-size: 34px 34px;
-  mask-image: linear-gradient(100deg, black, transparent);
+  display: none;
 }
 
 [data-theme-dark="true"] .bg-white {
@@ -315,4 +310,16 @@
 @keyframes loader-progress {
   0% { transform: translateX(140%); }
   100% { transform: translateX(-240%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-rise,
+  .animate-fade,
+  .animate-pop,
+  .animate-shimmer {
+    animation: none !important;
+  }
+  html {
+    scroll-behavior: auto;
+  }
 }

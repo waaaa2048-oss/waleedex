@@ -147,10 +147,10 @@ export function CustomerAuthForm({
           <Link href={storeBasePath || "/"} className="text-xs font-bold text-white/75 transition hover:text-white">
             العودة للمتجر
           </Link>
-          <p className="mt-7 text-[10px] font-extrabold tracking-[.18em] text-[var(--store-accent)]">
+          <p className="mt-7 text-[11px] font-semibold text-[var(--store-accent)]">
             يا مرحبا بضيوفنا
           </p>
-          <h1 className="mt-2 text-2xl font-black">حساب {storeName}</h1>
+          <h1 className="mt-2 text-2xl font-bold">حساب {storeName}</h1>
           <p className="mt-2 text-xs leading-6 text-white/70">
             {step === "details"
               ? "أكمل بيانات حسابك الشخصي للاستمرار."
@@ -174,7 +174,7 @@ export function CustomerAuthForm({
             </Field>
 
             {error ? (
-              <p role="alert" className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2.5 text-[11px] font-bold text-rose-700">
+              <p role="alert" className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2.5 text-[12px] font-bold text-rose-700">
                 {error}
               </p>
             ) : null}
@@ -187,7 +187,7 @@ export function CustomerAuthForm({
         ) : step === "otp" ? (
           <form onSubmit={handleVerifyOtp} className="space-y-4 p-6 sm:p-8">
             {successMsg ? (
-              <p className="rounded-xl bg-emerald-50 px-3 py-2.5 text-[11px] font-bold text-emerald-700">
+              <p className="rounded-xl bg-emerald-50 px-3 py-2.5 text-[12px] font-bold text-emerald-700">
                 {successMsg}
               </p>
             ) : null}
@@ -200,13 +200,13 @@ export function CustomerAuthForm({
                 placeholder="****"
                 value={otpCode}
                 onChange={(event) => setOtpCode(event.target.value)}
-                className="text-center text-lg tracking-widest"
+                className="text-center text-lg"
                 required
               />
             </Field>
 
             {error ? (
-              <p role="alert" className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2.5 text-[11px] font-bold text-rose-700">
+              <p role="alert" className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2.5 text-[12px] font-bold text-rose-700">
                 {error}
               </p>
             ) : null}
@@ -233,7 +233,7 @@ export function CustomerAuthForm({
         ) : (
           <form onSubmit={handleRegisterDetails} className="space-y-4 p-6 sm:p-8">
             {successMsg ? (
-              <p className="rounded-xl bg-emerald-50 px-3 py-2.5 text-[11px] font-bold text-emerald-700">
+              <p className="rounded-xl bg-emerald-50 px-3 py-2.5 text-[12px] font-bold text-emerald-700">
                 {successMsg}
               </p>
             ) : null}
@@ -270,7 +270,7 @@ export function CustomerAuthForm({
             </Field>
 
             {error ? (
-              <p role="alert" className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2.5 text-[11px] font-bold text-rose-700">
+              <p role="alert" className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2.5 text-[12px] font-bold text-rose-700">
                 {error}
               </p>
             ) : null}

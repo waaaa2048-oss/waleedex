@@ -43,9 +43,9 @@ export function CartDrawer({
       >
         <header className="flex items-center justify-between border-b border-[var(--store-line)] bg-[var(--store-card)] px-5 py-4">
           <div>
-            <p className="text-[10px] font-bold tracking-[0.18em] text-[var(--store-accent)]">متجر Waleedex</p>
-            <h2 className="mt-1 text-lg font-black text-[var(--store-ink)]">سلة الطلبات</h2>
-            <p className="mt-0.5 text-[11px] text-[#8a7f70]">{count} منتج · رسوم التوصيل تُحدد عند الإتمام</p>
+            <p className="text-[11px] font-bold text-[var(--store-accent-text)]">متجر Waleedex</p>
+            <h2 className="mt-1 text-lg font-bold text-[var(--store-ink)]">سلة الطلبات</h2>
+            <p className="mt-0.5 text-[12px] text-[var(--store-muted)]">{count} منتج · رسوم التوصيل تُحدد عند الإتمام</p>
           </div>
           <button
             type="button"
@@ -61,14 +61,14 @@ export function CartDrawer({
           {lines.length === 0 ? (
             <div className="flex h-full flex-col items-center justify-center rounded-3xl border border-dashed border-[var(--store-line)] bg-[var(--store-card)]/85 px-6 text-center">
               <span className="grid h-16 w-16 place-items-center rounded-2xl bg-[var(--store-surface)] text-3xl">🛍️</span>
-              <p className="mt-4 text-base font-black text-[var(--store-ink)]">سلتك بانتظار اختيارك</p>
-              <p className="mt-2 max-w-[17rem] text-xs leading-6 text-[#8a7f70]">
+              <p className="mt-4 text-base font-bold text-[var(--store-ink)]">سلتك بانتظار اختيارك</p>
+              <p className="mt-2 max-w-[17rem] text-xs leading-6 text-[var(--store-muted)]">
                 تصفح منتجات المتجر وأضف ما يناسبك إلى السلة.
               </p>
               <Link
                 href={productsHref}
                 onClick={closeCart}
-                className="mt-5 inline-flex h-11 items-center rounded-xl bg-[var(--store-primary)] px-5 text-xs font-extrabold text-white transition hover:opacity-90"
+                className="mt-5 inline-flex h-11 items-center rounded-xl bg-[var(--store-primary)] px-5 text-xs font-semibold text-white transition hover:opacity-90"
               >
                 تصفح المنتجات
               </Link>
@@ -87,10 +87,10 @@ export function CartDrawer({
                   <div className="min-w-0 flex-1">
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0">
-                        <p className="line-clamp-2 text-xs font-extrabold leading-5 text-[var(--store-ink)]">{line.name}</p>
-                        <p className="mt-1 text-[10px] text-[#8a7f70]">{line.category}</p>
+                        <p className="line-clamp-2 text-xs font-semibold leading-5 text-[var(--store-ink)]">{line.name}</p>
+                        <p className="mt-1 text-[11px] text-[var(--store-muted)]">{line.category}</p>
                         {line.selectedOptions?.length ? (
-                          <p className="mt-1 text-[10px] leading-5 text-[#6b5e51]">
+                          <p className="mt-1 text-[11px] leading-5 text-[#6b5e51]">
                             {line.selectedOptions.map((option) => `${option.modifierName}: ${option.label}`).join(" · ")}
                           </p>
                         ) : null}
@@ -98,7 +98,7 @@ export function CartDrawer({
                       <button
                         type="button"
                         onClick={() => removeItem(line.key ?? line.id)}
-                        className="grid h-8 w-8 shrink-0 place-items-center rounded-lg text-[#a1958a] transition hover:bg-rose-50 hover:text-rose-600"
+                        className="grid h-8 w-8 shrink-0 place-items-center rounded-lg text-[var(--store-faint)] transition hover:bg-rose-50 hover:text-rose-600"
                         aria-label={`إزالة ${line.name}`}
                       >
                         <Icon name="trash" className="h-3.5 w-3.5" />
@@ -114,7 +114,7 @@ export function CartDrawer({
                         >
                           −
                         </button>
-                        <span className="w-6 text-center text-xs font-extrabold">{line.quantity}</span>
+                        <span className="w-6 text-center text-xs font-semibold">{line.quantity}</span>
                         <button
                           type="button"
                           onClick={() => setQuantity(line.key ?? line.id, line.quantity + 1)}
@@ -124,7 +124,7 @@ export function CartDrawer({
                           +
                         </button>
                       </div>
-                      <span className="text-sm font-black text-[var(--store-primary)]">{formatMoney(line.price * line.quantity)}</span>
+                      <span className="text-sm font-bold text-[var(--store-primary)]">{formatMoney(line.price * line.quantity)}</span>
                     </div>
                   </div>
                 </li>
@@ -135,19 +135,19 @@ export function CartDrawer({
 
         {lines.length > 0 ? (
           <footer className="border-t border-[var(--store-line)] bg-[var(--store-card)] px-5 py-5">
-            <div className="flex items-center justify-between text-xs text-[#8a7f70]">
+            <div className="flex items-center justify-between text-xs text-[var(--store-muted)]">
               <span>المجموع الفرعي</span>
-              <span className="text-xl font-black text-[var(--store-ink)]">{formatMoney(subtotal)}</span>
+              <span className="text-xl font-bold text-[var(--store-ink)]">{formatMoney(subtotal)}</span>
             </div>
             {tabbyPromo ? <TabbyPromo {...tabbyPromo} price={subtotal} source="cart" /> : null}
-            <div className="mt-2 flex items-center justify-between rounded-xl bg-[var(--store-surface)] px-3 py-2 text-[11px]">
+            <div className="mt-2 flex items-center justify-between rounded-xl bg-[var(--store-surface)] px-3 py-2 text-[12px]">
               <span className="text-[#6b5e51]">رسوم التوصيل</span>
-              <span className="font-extrabold text-[var(--store-primary)]">تُحدد عند الإتمام</span>
+              <span className="font-semibold text-[var(--store-primary)]">تُحدد عند الإتمام</span>
             </div>
             <Link
               href={lines[0]?.storeSlug ? `/${lines[0].storeSlug}/checkout` : "/checkout"}
               onClick={closeCart}
-              className="mt-4 flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-[var(--store-primary)] text-sm font-extrabold text-white shadow-lg shadow-[var(--store-primary)]/15 transition hover:-translate-y-0.5 hover:opacity-95"
+              className="mt-4 flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-[var(--store-primary)] text-sm font-semibold text-white shadow-lg shadow-[var(--store-primary)]/15 transition hover:-translate-y-0.5 hover:opacity-95"
             >
               إتمام الطلب
               <Icon name="arrowLeft" className="h-4 w-4" />
@@ -155,11 +155,11 @@ export function CartDrawer({
             <button
               type="button"
               onClick={clear}
-              className="mt-2 w-full rounded-xl py-2 text-[11px] font-semibold text-[#9a8f81] transition hover:text-rose-600"
+              className="mt-2 w-full rounded-xl py-2 text-[12px] font-semibold text-[#9a8f81] transition hover:text-rose-600"
             >
               إفراغ السلة
             </button>
-            <p className="mt-2 text-center text-[10px] text-[#9a8f81]">
+            <p className="mt-2 text-center text-[11px] text-[#9a8f81]">
               تحتاج مساعدة؟ <a href={`tel:${BRAND.phone}`} className="font-bold text-[var(--store-primary)]" dir="ltr">{BRAND.phoneDisplay}</a>
             </p>
           </footer>
@@ -175,11 +175,11 @@ export function FavoritesBar() {
     <div className="flex items-center gap-2">
       <Link
         href="/wishlist"
-        className="relative hidden h-10 items-center gap-1.5 rounded-xl bg-[var(--store-card)] px-3 text-[11px] font-bold text-[var(--store-ink)] ring-1 ring-[var(--store-line)] transition hover:bg-[var(--store-bg)] sm:flex"
+        className="relative hidden h-10 items-center gap-1.5 rounded-xl bg-[var(--store-card)] px-3 text-[12px] font-bold text-[var(--store-ink)] ring-1 ring-[var(--store-line)] transition hover:bg-[var(--store-bg)] sm:flex"
       >
         <span className="text-sm">♡</span>
         المفضلة
-        <span className="grid h-5 min-w-5 place-items-center rounded-full bg-[var(--store-primary)] px-1 text-[10px] font-extrabold text-white">
+        <span className="grid h-5 min-w-5 place-items-center rounded-full bg-[var(--store-primary)] px-1 text-[11px] font-semibold text-white">
           {favorites.length}
         </span>
       </Link>
@@ -187,11 +187,11 @@ export function FavoritesBar() {
         type="button"
         onClick={openCart}
         aria-label={`فتح السلة، ${count} منتجات`}
-        className="relative flex h-10 items-center gap-2 rounded-xl bg-[var(--store-primary)] px-3 text-[11px] font-bold text-white transition hover:opacity-90 sm:px-4"
+        className="relative flex h-10 items-center gap-2 rounded-xl bg-[var(--store-primary)] px-3 text-[12px] font-bold text-white transition hover:opacity-90 sm:px-4"
       >
         <Icon name="box" className="h-4 w-4" />
         <span className="hidden sm:inline">السلة</span>
-        <span className="grid h-5 min-w-5 place-items-center rounded-full bg-[var(--store-accent)] px-1 text-[10px] font-extrabold text-[var(--store-ink)]">
+        <span className="grid h-5 min-w-5 place-items-center rounded-full bg-[var(--store-accent)] px-1 text-[11px] font-semibold text-[var(--store-ink)]">
           {count}
         </span>
       </button>

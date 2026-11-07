@@ -31,17 +31,17 @@ export type ThemePreset = {
 export const STORE_THEMES: readonly ThemePreset[] = Object.freeze([
   {
     id: "store-emerald",
-    name: "ثيم · ترابي فاخر",
-    subtitle: "دفء الضيافة السعودية",
-    version: "Store 2026",
+    name: "ثيم · أخضر عصري",
+    subtitle: "نظيف وواضح",
+    version: "Store Modern",
     colors: {
-      primary: "#6b3e26",
-      accent: "#d4a359",
-      background: "#fdfbf7",
-      surface: "#f8f5f0",
-      card: "#fdfbf7",
-      border: "#e8dfd5",
-      dark: "#2c2523",
+      primary: "#12503a",
+      accent: "#e2b04a",
+      background: "#ffffff",
+      surface: "#f4f6f4",
+      card: "#ffffff",
+      border: "#e3e8e4",
+      dark: "#14201b",
     },
   },
   {
@@ -105,6 +105,46 @@ export const STORE_THEMES: readonly ThemePreset[] = Object.freeze([
     },
   },
 ] as ThemePreset[]);
+
+/**
+ * ألوان الثيم القديم (الترابي). أي متجر لم يُغيّر ألوانه يُعرض تلقائياً بالثيم
+ * العصري الجديد دون لمس قاعدة البيانات. المتجر الذي خصّص ألوانه يبقى كما هو.
+ */
+const LEGACY_EMERALD = Object.freeze({ primary: "#6b3e26", background: "#fdfbf7" });
+
+export const MODERN_FONT_FAMILY = "IBM Plex Sans Arabic";
+
+export function withModernDefaults<
+  T extends {
+    themePreset: string;
+    primaryColor: string;
+    accentColor: string;
+    backgroundColor: string;
+    surfaceColor: string;
+    productCardBackground: string;
+    productCardBorder: string;
+    sidebarBackground: string;
+    fontFamily: string;
+  },
+>(settings: T): T {
+  const untouched =
+    settings.themePreset === "store-emerald" &&
+    settings.primaryColor.toLowerCase() === LEGACY_EMERALD.primary &&
+    settings.backgroundColor.toLowerCase() === LEGACY_EMERALD.background;
+  if (!untouched) return settings;
+  const modern = STORE_THEMES[0].colors;
+  return {
+    ...settings,
+    primaryColor: modern.primary,
+    accentColor: modern.accent,
+    backgroundColor: modern.background,
+    surfaceColor: modern.surface,
+    productCardBackground: modern.card,
+    productCardBorder: modern.border,
+    sidebarBackground: modern.background,
+    fontFamily: settings.fontFamily === "Tajawal" ? MODERN_FONT_FAMILY : settings.fontFamily,
+  };
+}
 
 /* ───────────── Homepage sections ───────────── */
 

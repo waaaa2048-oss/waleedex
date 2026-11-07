@@ -20,7 +20,7 @@ export function ProductCard({ product, compact = false }: { product: ProductDTO;
   const soldOut = product.stock === 0;
 
   return (
-    <article className="store-product-card group relative flex flex-col overflow-hidden rounded-[1.4rem] border bg-white shadow-[0_10px_35px_-28px_rgba(40,28,16,.6)] transition duration-300 hover:-translate-y-1 hover:border-[var(--store-accent)] hover:shadow-[0_22px_48px_-30px_rgba(40,28,16,.55)]">
+    <article className="store-product-card group relative flex flex-col overflow-hidden border bg-white transition-colors duration-200 hover:border-[var(--store-primary)]/40">
       <div className="store-product-image relative block overflow-hidden bg-[var(--store-surface)]">
         <Link href={productPath} aria-label={`عرض ${product.name}`} className="absolute inset-0">
           {product.imageUrl ? (
@@ -37,19 +37,19 @@ export function ProductCard({ product, compact = false }: { product: ProductDTO;
           )}
         </Link>
         <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between gap-2 p-2.5">
-          <span className={cn("rounded-full bg-white/95 px-2 py-1 text-[9px] font-extrabold ring-1 ring-inset", kind.badge)}>
+          <span className={cn("rounded-full bg-white/95 px-2 py-1 text-[11px] font-semibold ring-1 ring-inset", kind.badge)}>
             {kind.label}
           </span>
           <div className="pointer-events-auto flex shrink-0 items-center gap-1.5">
             {product.isFeatured ? (
-              <span className="product-card-discount rounded-full bg-[var(--store-accent)] px-2 py-1 text-[9px] font-extrabold text-[var(--store-ink)]">الأكثر مبيعاً</span>
+              <span className="product-card-discount rounded-full bg-[var(--store-accent)] px-2 py-1 text-[11px] font-semibold text-[var(--store-ink)]">الأكثر مبيعاً</span>
             ) : null}
             <button
               type="button"
               aria-pressed={favorite}
               className={cn(
                 "product-card-wish grid h-8 w-8 shrink-0 place-items-center rounded-full bg-white/95 shadow-sm ring-1 ring-[var(--store-line)] transition hover:scale-105",
-                favorite ? "text-rose-600" : "text-[#a1958a]",
+                favorite ? "text-rose-600" : "text-[var(--store-faint)]",
               )}
               onClick={() => {
                 toggleFavorite(product.id);
@@ -63,29 +63,29 @@ export function ProductCard({ product, compact = false }: { product: ProductDTO;
         </div>
         {soldOut ? (
           <div className="product-card-out-of-stock absolute inset-0 grid place-items-center bg-[var(--store-ink)]/55">
-            <span className="rounded-lg bg-white px-3 py-1.5 text-[11px] font-extrabold text-[var(--store-ink)]">نفد المخزون</span>
+            <span className="rounded-lg bg-white px-3 py-1.5 text-[12px] font-semibold text-[var(--store-ink)]">نفد المخزون</span>
           </div>
         ) : null}
       </div>
 
-      <Link href={productPath} className="product-card-quick-view absolute top-2 start-2 z-10 hidden h-8 items-center gap-1 rounded-full bg-white/95 px-2.5 text-[9px] font-bold text-[var(--store-primary)] shadow-sm ring-1 ring-[var(--store-line)]">
+      <Link href={productPath} className="product-card-quick-view absolute top-2 start-2 z-10 hidden h-8 items-center gap-1 rounded-full bg-white/95 px-2.5 text-[11px] font-bold text-[var(--store-primary)] shadow-sm ring-1 ring-[var(--store-line)]">
         <Icon name="search" className="h-3.5 w-3.5" /> عرض سريع
       </Link>
 
       <div className="product-card-info flex flex-1 flex-col p-3 sm:p-4">
-        <span className="product-card-category text-[9px] font-extrabold text-[#98713a]">{product.category}</span>
-        <Link href={productPath} className="product-card-title mt-1.5 line-clamp-2 min-h-10 text-[13px] font-extrabold leading-5 text-[var(--store-ink)] transition hover:text-[var(--store-primary)] sm:text-sm">
+        <span className="product-card-category text-xs font-medium text-[var(--store-muted)]">{product.category}</span>
+        <Link href={productPath} className="product-card-title mt-1.5 line-clamp-2 min-h-10 text-[13px] font-semibold leading-5 text-[var(--store-ink)] transition hover:text-[var(--store-primary)] sm:text-sm">
           {product.name}
         </Link>
         {!compact ? (
-          <p className="mt-1 line-clamp-2 text-[10px] leading-4 text-[#8a7f70]">{publicProductDescription(product.description)}</p>
+          <p className="mt-1 line-clamp-2 text-[11px] leading-4 text-[var(--store-muted)]">{publicProductDescription(product.description)}</p>
         ) : null}
 
         <div className="mt-auto pt-3">
           <div className="flex items-end justify-between gap-2">
             <div>
-              <p className="text-base font-extrabold text-[var(--store-primary)]">{formatMoney(product.price)}</p>
-              <p className="text-[9px] font-semibold text-[#a1958a]">
+              <p className="text-lg font-bold text-[var(--store-ink)]">{formatMoney(product.price)}</p>
+              <p className="text-[11px] font-semibold text-[var(--store-faint)]">
                 {product.fixedPrice ? "سعر الوجبة كاملة" : `${formatMoney(product.pricePerKg)} / كجم`}
               </p>
             </div>
@@ -105,12 +105,12 @@ export function ProductCard({ product, compact = false }: { product: ProductDTO;
                 openCart();
               }}
               className={cn(
-                "product-card-add flex h-9 shrink-0 items-center justify-center gap-1.5 rounded-xl px-3 text-[11px] font-extrabold transition",
+                "product-card-add flex h-9 shrink-0 items-center justify-center gap-1.5 rounded-xl px-3 text-[12px] font-semibold transition",
                 soldOut
-                  ? "cursor-not-allowed bg-[var(--store-surface)] text-[#a1958a]"
+                  ? "cursor-not-allowed bg-[var(--store-surface)] text-[var(--store-faint)]"
                   : lastAdded === product.id
-                    ? "bg-[var(--store-accent)] text-[var(--store-ink)]"
-                    : "bg-[var(--store-accent)] text-[var(--store-ink)] hover:bg-[#c58f47]",
+                    ? "bg-emerald-600 text-white"
+                    : "bg-[var(--store-primary)] text-white hover:opacity-90",
               )}
               disabled={soldOut}
             >

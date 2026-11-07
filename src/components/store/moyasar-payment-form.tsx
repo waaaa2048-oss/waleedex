@@ -114,7 +114,7 @@ export function MoyasarPaymentForm({
     <div className="space-y-3">
       {error ? <p role="alert" className="rounded-xl bg-rose-50 p-3 text-xs font-bold text-rose-700">{error}</p> : null}
       <div className="mysr-form" />
-      <p className="text-center text-[10px] leading-5 text-[#756858]">
+      <p className="text-center text-[11px] leading-5 text-[#756858]">
         أكمل الدفع في النموذج الآمن. لن يُؤكد الطلب إلا بعد التحقق من العملية لدى ميسر.
       </p>
     </div>

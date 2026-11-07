@@ -26,9 +26,9 @@ export function AddToCartButton({
   const pathname = usePathname();
   const soldOut = product.stock === 0;
   const classNames = cn(
-    "inline-flex h-11 items-center justify-center gap-2 rounded-xl px-5 text-xs font-extrabold transition active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60",
-    variant === "solid" && "bg-[var(--store-accent)] text-[var(--store-ink)] hover:bg-[#c58f47]",
-    variant === "gold" && "bg-[var(--store-accent)] text-[var(--store-ink)] hover:bg-[#c58f47]",
+    "inline-flex h-11 items-center justify-center gap-2 rounded-xl px-5 text-xs font-semibold transition active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60",
+    variant === "solid" && "bg-[var(--store-accent)] text-[var(--store-ink)] hover:brightness-95",
+    variant === "gold" && "bg-[var(--store-accent)] text-[var(--store-ink)] hover:brightness-95",
     variant === "outline" && "bg-[var(--store-card)] text-[var(--store-primary)] ring-1 ring-[var(--store-line)] hover:bg-[var(--store-bg)]",
     className,
   );
@@ -101,8 +101,8 @@ export function BuyBar({ product }: { product: ProductDTO }) {
       ) : null}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="text-[10px] font-bold text-[#a1958a]">الإجمالي</p>
-          <p className="text-xl font-extrabold text-[var(--store-primary)]">{formatMoney(selectedPrice * quantity)}</p>
+          <p className="text-[11px] font-bold text-[var(--store-faint)]">الإجمالي</p>
+          <p className="text-xl font-semibold text-[var(--store-primary)]">{formatMoney(selectedPrice * quantity)}</p>
         </div>
         <div className="flex items-center gap-2">
           <button
@@ -113,7 +113,7 @@ export function BuyBar({ product }: { product: ProductDTO }) {
           >
             −
           </button>
-          <span className="w-8 text-center text-sm font-extrabold">{quantity}</span>
+          <span className="w-8 text-center text-sm font-semibold">{quantity}</span>
           <button
             type="button"
             onClick={() => setQuantity((value) => Math.min(20, value + 1))}
@@ -134,7 +134,7 @@ export function BuyBar({ product }: { product: ProductDTO }) {
             toast(`تمت إضافة ${quantity} × ${product.name} إلى السلة`);
             openCart();
           }}
-          className="flex h-11 flex-1 items-center justify-center gap-2 rounded-xl bg-[var(--store-accent)] text-sm font-extrabold text-[var(--store-ink)] transition hover:bg-[#c58f47] disabled:cursor-not-allowed disabled:opacity-50"
+          className="flex h-11 flex-1 items-center justify-center gap-2 rounded-xl bg-[var(--store-accent)] text-sm font-semibold text-[var(--store-ink)] transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-50"
         >
           <Icon name="box" className="h-4 w-4" />
           {soldOut ? "غير متوفر" : missingRequired ? "اختر الخيارات المطلوبة" : "أضف للسلة"}
@@ -145,7 +145,7 @@ export function BuyBar({ product }: { product: ProductDTO }) {
           )}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex h-11 flex-1 items-center justify-center gap-2 rounded-xl bg-[var(--store-surface)] text-sm font-extrabold text-[var(--store-primary)] transition hover:bg-[var(--store-line)]"
+          className="flex h-11 flex-1 items-center justify-center gap-2 rounded-xl bg-[var(--store-surface)] text-sm font-semibold text-[var(--store-primary)] transition hover:bg-[var(--store-line)]"
         >
           <Icon name="phone" className="h-4 w-4" />
           تواصل معنا عبر واتساب

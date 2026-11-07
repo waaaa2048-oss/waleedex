@@ -21,11 +21,11 @@ export function CartQuickBar({ lifted = false }: { lifted?: boolean }) {
           <Icon name="box" className="h-5 w-5" />
         </span>
         <span className="min-w-0">
-          <span className="block text-xs font-extrabold">مراجعة السلة</span>
-          <span className="mt-0.5 block text-[10px] text-white/75">{count} {count === 1 ? "منتج" : "منتجات"}</span>
+          <span className="block text-xs font-semibold">مراجعة السلة</span>
+          <span className="mt-0.5 block text-[11px] text-white/75">{count} {count === 1 ? "منتج" : "منتجات"}</span>
         </span>
       </span>
-      <span className="shrink-0 text-sm font-extrabold">{formatMoney(subtotal)}</span>
+      <span className="shrink-0 text-sm font-semibold">{formatMoney(subtotal)}</span>
     </button>
   );
 }

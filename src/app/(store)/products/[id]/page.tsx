@@ -48,7 +48,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
 
   return (
     <div className="mx-auto w-full max-w-7xl px-4 pb-12 pt-6 sm:pt-9">
-      <nav className="flex flex-wrap items-center gap-1.5 text-[10px] font-bold text-[#a1958a]">
+      <nav className="flex flex-wrap items-center gap-1.5 text-[11px] font-bold text-[var(--store-faint)]">
         <Link href="/" className="hover:text-[var(--store-primary)]">
           الرئيسية
         </Link>
@@ -76,11 +76,11 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
               </div>
             )}
             <div className="absolute top-3 start-3 flex flex-col gap-1.5">
-              <span className={`rounded-full bg-white/95 px-2.5 py-1 text-[10px] font-extrabold ring-1 ring-inset ${kind.badge}`}>
+              <span className={`rounded-full bg-white/95 px-2.5 py-1 text-[11px] font-semibold ring-1 ring-inset ${kind.badge}`}>
                 {kind.label}
               </span>
               {product.isFeatured ? (
-                <span className="rounded-full bg-[var(--store-accent)] px-2.5 py-1 text-[10px] font-extrabold text-[var(--store-ink)]">
+                <span className="rounded-full bg-[var(--store-accent)] px-2.5 py-1 text-[11px] font-semibold text-[var(--store-ink)]">
                   الأكثر مبيعاً
                 </span>
               ) : null}
@@ -91,18 +91,18 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
             {PRODUCT_FEATURES.map((feature) => (
               <div key={feature.title} className="rounded-xl bg-white p-2.5 text-center ring-1 ring-[var(--store-line)]">
                 <span className="text-base">{feature.emoji}</span>
-                <p className="mt-1 text-[10px] font-extrabold text-[var(--store-ink)]">{feature.title}</p>
-                <p className="mt-0.5 text-[9px] leading-4 text-[#8a7f70]">{feature.text}</p>
+                <p className="mt-1 text-[11px] font-semibold text-[var(--store-ink)]">{feature.title}</p>
+                <p className="mt-0.5 text-[11px] leading-4 text-[var(--store-muted)]">{feature.text}</p>
               </div>
             ))}
           </div>
         </div>
 
         <div>
-          <p className="text-[10px] font-extrabold tracking-[0.18em] text-[#98713a]">{product.category}</p>
-          <h1 className="mt-2 text-2xl font-black leading-9 text-[var(--store-ink)] sm:text-3xl sm:leading-[1.5]">{product.name}</h1>
+          <p className="text-[11px] font-semibold text-[var(--store-primary)]">{product.category}</p>
+          <h1 className="mt-2 text-2xl font-bold leading-9 text-[var(--store-ink)] sm:text-3xl sm:leading-[1.5]">{product.name}</h1>
 
-          <div className="mt-2 flex flex-wrap items-center gap-2 text-[10px]">
+          <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px]">
             <span className="rounded-full bg-[var(--store-surface)] px-2.5 py-1 font-bold text-[var(--store-primary)]">من اختيارات {settings.storeName}</span>
             <span className={`rounded-full px-2 py-0.5 font-bold ${animal.chip}`}>
               {animal.emoji} {product.animalType}
@@ -116,8 +116,8 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
 
           <div className="mt-4 rounded-3xl border border-[var(--store-line)] bg-white p-5 shadow-[0_12px_35px_-30px_rgba(43,30,16,.5)] sm:p-6">
             <div className="flex items-end gap-2">
-              <p className="text-2xl font-black text-[var(--store-primary)]">{formatMoney(product.price)}</p>
-              <p className="pb-1 text-[10px] text-[#a1958a]">
+              <p className="text-2xl font-bold text-[var(--store-primary)]">{formatMoney(product.price)}</p>
+              <p className="pb-1 text-[11px] text-[var(--store-faint)]">
                 {product.fixedPrice ? "شامل الطبخ والتقديم" : `${formatMoney(product.pricePerKg)} / كجم · ${product.weightKg} كجم`}
               </p>
             </div>
@@ -129,12 +129,12 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
                 merchantCode={paymentCredentials.tabbyMerchantCode}
               />
             ) : (
-              <p className="mt-2 text-[10px] leading-5 text-[#8a7f70]">
+              <p className="mt-2 text-[11px] leading-5 text-[var(--store-muted)]">
                 طرق الدفع المتاحة تظهر لك عند إتمام الطلب.
               </p>
             )}
             {showTabbyPromo ? (
-              <div className="mt-3 inline-flex rounded-md bg-[var(--store-surface)] px-2 py-1 text-[9px] font-bold text-[#5d5245]">
+              <div className="mt-3 inline-flex rounded-md bg-[var(--store-surface)] px-2 py-1 text-[11px] font-bold text-[var(--store-body)]">
                 تابي
               </div>
             ) : null}
@@ -147,8 +147,8 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
               { label: "التسعير", value: product.fixedPrice ? "سعر ثابت" : "حسب الوزن" },
             ].map((item) => (
               <div key={item.label} className="rounded-2xl border border-[var(--store-line)] bg-white px-3 py-3 text-center">
-                <p className="text-[9px] font-bold text-[#8a7f70]">{item.label}</p>
-                <p className="mt-1 text-[11px] font-extrabold text-[var(--store-ink)]">{item.value}</p>
+                <p className="text-[11px] font-bold text-[var(--store-muted)]">{item.label}</p>
+                <p className="mt-1 text-[12px] font-semibold text-[var(--store-ink)]">{item.value}</p>
               </div>
             ))}
           </div>
@@ -158,29 +158,29 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
           </div>
 
           <div className="mt-3 rounded-2xl border border-[var(--store-line)] bg-white p-4 sm:p-5">
-            <h2 className="text-sm font-extrabold text-[var(--store-ink)]">تفاصيل المنتج والتجهيز</h2>
+            <h2 className="text-sm font-semibold text-[var(--store-ink)]">تفاصيل المنتج والتجهيز</h2>
             <div className="mt-2 space-y-2.5">
               {paragraphs.length > 0 ? (
                 paragraphs.map((paragraph, index) => (
-                  <p key={index} className="text-[11px] leading-6 text-[#5d5245]">
+                  <p key={index} className="text-[12px] leading-6 text-[var(--store-body)]">
                     {paragraph}
                   </p>
                 ))
               ) : (
-                <p className="text-[11px] leading-6 text-[#8a7f70]">تواصل معنا لمعرفة تفاصيل هذه الوجبة.</p>
+                <p className="text-[12px] leading-6 text-[var(--store-muted)]">تواصل معنا لمعرفة تفاصيل هذه الوجبة.</p>
               )}
             </div>
-            <p className="mt-3 rounded-xl bg-[var(--store-surface)] px-3 py-2.5 text-[10px] leading-5 text-[#5d5245]">
+            <p className="mt-3 rounded-xl bg-[var(--store-surface)] px-3 py-2.5 text-[11px] leading-5 text-[var(--store-body)]">
               لديك تفضيل لطريقة التقطيع أو الطبخ؟ أضفه في خانة تفضيلات التجهيز عند إتمام الطلب ليصل للفريق مع طلبك.
             </p>
           </div>
 
           <div className="mt-3 rounded-2xl bg-[var(--store-primary)] p-4 text-white">
-            <p className="flex items-center gap-1.5 text-[11px] font-extrabold">
+            <p className="flex items-center gap-1.5 text-[12px] font-semibold">
               <Icon name="truck" className="h-4 w-4 text-[var(--store-accent)]" />
               التوصيل والتحضير
             </p>
-            <ul className="mt-2 space-y-1.5 text-[10px] leading-5 text-white/65">
+            <ul className="mt-2 space-y-1.5 text-[11px] leading-5 text-white/65">
               <li>• توصيل داخل مدينة الرياض بخيار فوري أو موعد مجدول.</li>
               <li>• اطلب قبل موعد عزيمتك بـ ٣ — ٤ ساعات لضمان أعلى جودة طبخ.</li>
               <li>• جميع الذبائح مفحوصة من قِبل طبيب بيطري قبل الطبخ.</li>
@@ -191,13 +191,13 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
 
       {/* Reviews */}
       <section className="mt-9">
-        <h2 className="text-lg font-black text-[var(--store-ink)]">آراء العملاء</h2>
+        <h2 className="text-lg font-bold text-[var(--store-ink)]">آراء العملاء</h2>
         <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {TESTIMONIALS.map((review) => (
             <figure key={review.name} className="rounded-2xl bg-white p-3.5 ring-1 ring-[var(--store-line)]">
-              <div className="text-[10px] text-[var(--store-accent)]">★★★★★</div>
-              <blockquote className="mt-1.5 text-[11px] leading-6 text-[#5d5245]">«{review.quote}»</blockquote>
-              <figcaption className="mt-2 text-[10px] font-extrabold text-[var(--store-ink)]">{review.name}</figcaption>
+              <div className="text-[11px] text-[var(--store-accent)]">★★★★★</div>
+              <blockquote className="mt-1.5 text-[12px] leading-6 text-[var(--store-body)]">«{review.quote}»</blockquote>
+              <figcaption className="mt-2 text-[11px] font-semibold text-[var(--store-ink)]">{review.name}</figcaption>
             </figure>
           ))}
         </div>
@@ -206,8 +206,8 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
       {related.length > 0 ? (
         <section className="mt-9">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-black text-[var(--store-ink)]">منتجات مشابهة</h2>
-            <Link href="/products" className="text-[11px] font-extrabold text-[var(--store-primary)]">
+            <h2 className="text-lg font-bold text-[var(--store-ink)]">منتجات مشابهة</h2>
+            <Link href="/products" className="text-[12px] font-semibold text-[var(--store-primary)]">
               عرض الكل ←
             </Link>
           </div>

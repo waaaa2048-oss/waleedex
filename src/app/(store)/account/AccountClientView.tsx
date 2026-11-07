@@ -200,7 +200,7 @@ export default function AccountClientView({
                       }`}>
                         {order.status === 'new' ? 'جديد / قيد المعالجة' : order.status}
                       </span>
-                      <span className='font-extrabold text-gray-900 text-base'>
+                      <span className='font-semibold text-gray-900 text-base'>
                         {Number(order.total_amount)} ر.س
                       </span>
                     </div>
@@ -269,7 +269,7 @@ export default function AccountClientView({
                             <img src={item.products.image} alt='' className='w-7 h-7 rounded-lg object-cover' />
                           )}
                           <span className='font-bold text-gray-800'>{item.products?.name || item.name}</span>
-                          <span className='text-emerald-700 font-extrabold bg-emerald-50 px-1.5 py-0.5 rounded-md'>(×{item.quantity})</span>
+                          <span className='text-emerald-700 font-semibold bg-emerald-50 px-1.5 py-0.5 rounded-md'>(×{item.quantity})</span>
                         </div>
                       ))}
                     </div>

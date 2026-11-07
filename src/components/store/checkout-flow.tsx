@@ -205,7 +205,7 @@ export function CheckoutFlow({
     return (
       <div dir='rtl' className='max-w-2xl mx-auto p-8 bg-white rounded-3xl shadow-sm text-center space-y-6 my-12 border border-emerald-100'>
         <div className='w-20 h-20 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-4xl shadow-inner'>✓</div>
-        <h1 className='text-3xl font-extrabold text-gray-800'>تم استلام طلبك بنجاح!</h1>
+        <h1 className='text-3xl font-semibold text-gray-800'>تم استلام طلبك بنجاح!</h1>
         <p className='text-gray-600 text-base'>رقم الطلب الرسمي: <strong className='text-emerald-700 text-xl font-mono'>{orderComplete.code}</strong></p>
         <p className='text-sm text-gray-500 leading-relaxed'>جاري تجهيز طلبك ومراجعته من قِبل الإدارة والمطبخ. يمكنك متابعة حالة الطلب وتفاصيله بالكامل من صفحة حسابك الشخصي.</p>
         <div className='flex justify-center gap-4 pt-4'>
@@ -227,7 +227,7 @@ export function CheckoutFlow({
   if (lines.length === 0) {
     return (
       <div dir="rtl" className="mx-auto my-12 max-w-2xl space-y-4 rounded-3xl border border-gray-100 bg-white p-8 text-center shadow-sm">
-        <h1 className="text-2xl font-extrabold text-gray-900">سلة هذا المتجر فارغة</h1>
+        <h1 className="text-2xl font-semibold text-gray-900">سلة هذا المتجر فارغة</h1>
         <p className="text-sm text-gray-500">لا توجد منتجات من {storeSlug} في سلة الإتمام الحالية.</p>
         <Link href={`/${storeSlug}/products`} className="inline-flex rounded-xl bg-emerald-600 px-6 py-3 font-bold text-white transition hover:bg-emerald-700">
           تصفح منتجات المتجر
@@ -239,7 +239,7 @@ export function CheckoutFlow({
   return (
     <div dir='rtl' className='max-w-4xl mx-auto p-4 sm:p-6 font-sans space-y-6'>
       <div className='bg-white p-6 rounded-3xl shadow-sm border border-gray-100'>
-        <h1 className='text-2xl font-extrabold text-gray-900'>إتمام الطلب والدفع</h1>
+        <h1 className='text-2xl font-semibold text-gray-900'>إتمام الطلب والدفع</h1>
         <p className='text-xs text-gray-400 mt-1'>يرجى استكمال البيانات أدناه لتأكيد وتجهيز طلبك بكل دقة</p>
       </div>
 
@@ -261,13 +261,13 @@ export function CheckoutFlow({
                     <p className='font-bold text-gray-800 text-sm'>{item.name}</p>
                     <p className='text-xs text-gray-400 mt-0.5'>الكمية: ×{item.quantity} | السعر الفردي: {item.price} ر.س</p>
                     {item.selectedOptions?.length ? (
-                      <p className='text-[11px] text-gray-500 mt-1'>
+                      <p className='text-[12px] text-gray-500 mt-1'>
                         {item.selectedOptions.map((option) => `${option.modifierName}: ${option.label}`).join(' · ')}
                       </p>
                     ) : null}
                   </div>
                 </div>
-                <span className='font-extrabold text-emerald-700 text-sm'>{(item.price * item.quantity)} ر.س</span>
+                <span className='font-semibold text-emerald-700 text-sm'>{(item.price * item.quantity)} ر.س</span>
               </div>
             ))}
           </div>
@@ -445,9 +445,9 @@ export function CheckoutFlow({
         <div className='bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-4'>
           <div>
             <span className='text-sm text-gray-500 block'>الإجمالي النهائي للطلب:</span>
-            <span className='text-3xl font-extrabold text-emerald-700'>{total} <span className='text-base font-normal'>ر.س</span></span>
+            <span className='text-3xl font-semibold text-emerald-700'>{total} <span className='text-base font-normal'>ر.س</span></span>
           </div>
-          <button type='submit' disabled={checkoutLoading || receiptUploading || paymentOptions.length === 0} className='w-full sm:w-auto bg-emerald-600 text-white px-10 py-4 rounded-2xl font-extrabold text-base hover:bg-emerald-700 transition shadow-lg shadow-emerald-600/25 disabled:opacity-50'>
+          <button type='submit' disabled={checkoutLoading || receiptUploading || paymentOptions.length === 0} className='w-full sm:w-auto bg-emerald-600 text-white px-10 py-4 rounded-2xl font-semibold text-base hover:bg-emerald-700 transition shadow-lg shadow-emerald-600/25 disabled:opacity-50'>
             {checkoutLoading ? 'جاري تأكيد وإنشاء الطلب...' : 'إتمام وتأكيد الطلب الآن 🚀'}
           </button>
         </div>

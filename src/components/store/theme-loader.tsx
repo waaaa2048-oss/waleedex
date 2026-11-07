@@ -90,9 +90,9 @@ export function ThemeLoader({
           )}
         </div>
         <div className="animate-rise">
-          <p className="text-lg font-black sm:text-2xl">{storeName}</p>
+          <p className="text-lg font-bold sm:text-2xl">{storeName}</p>
           <p className="mt-1 text-xs font-bold text-[var(--store-accent)]">{tagline}</p>
-          <p className="mt-2 text-[10px] text-white/70">نجهّز لك تجربة المتجر…</p>
+          <p className="mt-2 text-[11px] text-white/70">نجهّز لك تجربة المتجر…</p>
         </div>
         <div className="h-1 w-36 overflow-hidden rounded-full bg-white/20">
           <span className="block h-full w-1/2 animate-[loader-progress_1.5s_ease-in-out_infinite] rounded-full bg-[var(--store-accent)]" />

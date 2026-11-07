@@ -16,7 +16,7 @@ export function CustomerLogout() {
         router.refresh();
       }}
       disabled={loading}
-      className="inline-flex h-9 items-center gap-1.5 rounded-xl bg-white/15 px-3 text-[11px] font-bold text-white ring-1 ring-white/20 transition hover:bg-white/25 disabled:opacity-60"
+      className="inline-flex h-9 items-center gap-1.5 rounded-xl bg-white/15 px-3 text-[12px] font-bold text-white ring-1 ring-white/20 transition hover:bg-white/25 disabled:opacity-60"
     >
       {loading ? "جاري الخروج..." : "تسجيل الخروج"}
     </button>

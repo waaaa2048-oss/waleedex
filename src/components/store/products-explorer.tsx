@@ -55,7 +55,7 @@ export function ProductsExplorer({
       <div className="rounded-3xl border border-[var(--store-line)] bg-white p-3.5">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
           <div className="relative flex-1">
-            <Icon name="search" className="pointer-events-none absolute top-1/2 right-3.5 h-4 w-4 -translate-y-1/2 text-[#a1958a]" />
+            <Icon name="search" className="pointer-events-none absolute top-1/2 right-3.5 h-4 w-4 -translate-y-1/2 text-[var(--store-faint)]" />
             <input
               value={query}
               onChange={(event) => setQuery(event.target.value)}
@@ -67,7 +67,7 @@ export function ProductsExplorer({
             <select
               value={kind}
               onChange={(event) => setKind(event.target.value)}
-              className="h-10 rounded-xl border border-[var(--store-line)] bg-[var(--store-bg)] px-3 text-[11px] font-bold text-[var(--store-ink)] outline-none"
+              className="h-10 rounded-xl border border-[var(--store-line)] bg-[var(--store-bg)] px-3 text-[12px] font-bold text-[var(--store-ink)] outline-none"
             >
               <option value="all">كل الأنواع</option>
               {Object.entries(KIND_META).map(([value, meta]) => (
@@ -79,7 +79,7 @@ export function ProductsExplorer({
             <select
               value={sort}
               onChange={(event) => setSort(event.target.value)}
-              className="h-10 rounded-xl border border-[var(--store-line)] bg-[var(--store-bg)] px-3 text-[11px] font-bold text-[var(--store-ink)] outline-none"
+              className="h-10 rounded-xl border border-[var(--store-line)] bg-[var(--store-bg)] px-3 text-[12px] font-bold text-[var(--store-ink)] outline-none"
             >
               <option value="featured">الأكثر مبيعاً</option>
               <option value="newest">الأحدث</option>
@@ -90,10 +90,10 @@ export function ProductsExplorer({
               type="button"
               onClick={() => setOnlyFavorites((value) => !value)}
               className={cn(
-                "flex h-10 items-center gap-1.5 rounded-xl px-3 text-[11px] font-bold transition",
+                "flex h-10 items-center gap-1.5 rounded-xl px-3 text-[12px] font-bold transition",
                 onlyFavorites
                   ? "bg-[var(--store-primary)] text-white"
-                  : "bg-[var(--store-bg)] text-[#5d5245] ring-1 ring-[var(--store-line)] hover:bg-[var(--store-surface)]",
+                  : "bg-[var(--store-bg)] text-[var(--store-body)] ring-1 ring-[var(--store-line)] hover:bg-[var(--store-surface)]",
               )}
             >
               ♡ المفضلة ({favorites.length})
@@ -108,10 +108,10 @@ export function ProductsExplorer({
               type="button"
               onClick={() => setCategory(item)}
               className={cn(
-                "shrink-0 rounded-lg px-3 py-1.5 text-[11px] font-bold transition",
+                "shrink-0 rounded-lg px-3 py-1.5 text-[12px] font-bold transition",
                 category === item
                   ? "bg-[var(--store-primary)]/10 text-[var(--store-primary)]"
-                  : "text-[#8a7f70] hover:bg-[var(--store-bg)] hover:text-[var(--store-primary)]",
+                  : "text-[var(--store-muted)] hover:bg-[var(--store-bg)] hover:text-[var(--store-primary)]",
               )}
             >
               {item}
@@ -120,13 +120,13 @@ export function ProductsExplorer({
         </div>
       </div>
 
-      <p className="px-1 text-[11px] font-semibold text-[#8a7f70]">{visible.length} منتج متاح</p>
+      <p className="px-1 text-[12px] font-semibold text-[var(--store-muted)]">{visible.length} منتج متاح</p>
 
       {visible.length === 0 ? (
         <div className="grid place-items-center rounded-3xl border border-[var(--store-line)] bg-white px-6 py-14 text-center">
           <span className="grid h-16 w-16 place-items-center rounded-2xl bg-[var(--store-surface)] text-3xl">🐐</span>
-          <p className="mt-4 text-sm font-extrabold text-[var(--store-ink)]">لا توجد منتجات مطابقة</p>
-          <p className="mt-1 max-w-sm text-[11px] leading-6 text-[#8a7f70]">
+          <p className="mt-4 text-sm font-semibold text-[var(--store-ink)]">لا توجد منتجات مطابقة</p>
+          <p className="mt-1 max-w-sm text-[12px] leading-6 text-[var(--store-muted)]">
             جرّب تغيير القسم أو كلمة البحث، أو تواصل معنا على واتساب لتجهيز طلب خاص.
           </p>
           <button
