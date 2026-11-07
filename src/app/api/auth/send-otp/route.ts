@@ -31,9 +31,11 @@ export async function POST(request: Request) {
     );
   }
 
-  const idInstance = process.env.GREEN_API_ID_INSTANCE;
-  const apiTokenInstance = process.env.GREEN_API_TOKEN_INSTANCE;
-  if (!idInstance || !apiTokenInstance) {
+  const idInstance = process.env.GREEN_API_ID ?? process.env.GREEN_API_ID_INSTANCE;
+  const apiTokenInstance = process.env.GREEN_API_TOKEN ?? process.env.GREEN_API_TOKEN_INSTANCE;
+  // كل حساب في Green API له رابط خاص (مثل https://7107.api.greenapi.com)
+  const apiBase = (process.env.GREEN_API_URL || "https://api.green-api.com").replace(/\/+$/, "");
+  if (!idInstance || !apiTokenInstance || !/^https:\/\//.test(apiBase)) {
     console.error("[send-otp] GREEN_API_* غير مضبوطة");
     return NextResponse.json(
       { success: false, error: "خدمة إرسال الرمز غير متاحة حالياً" },
@@ -46,7 +48,7 @@ export async function POST(request: Request) {
     const chatId = `966${phone.slice(1)}@c.us`;
 
     const response = await fetch(
-      `https://api.green-api.com/waInstance${idInstance}/sendMessage/${apiTokenInstance}`,
+      `${apiBase}/waInstance${idInstance}/sendMessage/${apiTokenInstance}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
