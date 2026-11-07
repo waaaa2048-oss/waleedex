@@ -181,14 +181,11 @@ function HeroCarousel({ section, settings, featured }: { section: HomepageSectio
           ) : (
             <div className="absolute inset-0 grid place-items-center bg-[var(--store-surface)] text-7xl">🛍️</div>
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/5 to-transparent lg:bg-gradient-to-l lg:from-black/35 lg:via-transparent lg:to-transparent" />
-          <div className="absolute bottom-4 end-4 start-4 flex items-end justify-between gap-3 sm:bottom-6 sm:end-6 sm:start-6">
-            <div className="rounded-xl bg-black/45 px-4 py-3 text-white backdrop-blur-md">
-              <p className="text-[11px] font-bold text-white/70">لجمعتكم وعزائمكم</p>
-              <p className="mt-1 text-xs font-semibold">عزيمة مرتبة من أولها</p>
+          {featured ? (
+            <div className="absolute bottom-4 end-4 sm:bottom-6 sm:end-6">
+              <AddToCartButton product={featured} variant="gold" label={`اطلب ${featured.name}`} className="h-10 max-w-[16rem] truncate rounded-xl px-4 text-xs" />
             </div>
-            {featured ? <AddToCartButton product={featured} variant="gold" label="اطلب المميز" className="h-10 rounded-xl px-3 text-[11px]" /> : null}
-          </div>
+          ) : null}
         </div>
       </div>
     </section>
@@ -212,7 +209,7 @@ function WideBanner({ section }: { section: HomepageSection }) {
 function CustomReviews({ section }: { section: HomepageSection }) {
   const reviews = section.items;
   if (!reviews.length) return <Reviews section={section} />;
-  return <section className="border-y border-[var(--store-line)] bg-[var(--store-surface)] py-8"><div className="mx-auto max-w-7xl px-4"><SectionTitle title={section.title} subtitle={section.subtitle} /><div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">{reviews.map((review) => <figure key={review.id} className="rounded-2xl bg-[var(--store-card)] p-4 ring-1 ring-[var(--store-line)]"><p className="text-[11px] text-[var(--store-accent)]">★★★★★</p><blockquote className="mt-2 min-h-12 text-[12px] leading-6 text-[var(--store-body)]">«{review.subtitle || "تجربة رائعة وخدمة مميزة."}»</blockquote><figcaption className="mt-3 border-t border-[var(--store-line)] pt-2 text-[11px] font-semibold">{review.title}</figcaption></figure>)}</div></div></section>;
+  return <section className="border-y border-[var(--store-line)] bg-[var(--store-surface)] py-8"><div className="mx-auto max-w-7xl px-4"><SectionTitle title={section.title} subtitle={section.subtitle} /><div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">{reviews.map((review) => <figure key={review.id} className="rounded-2xl bg-[var(--store-card)] p-4 ring-1 ring-[var(--store-line)]"><p className="text-[11px] text-[var(--store-accent)]">★★★★★</p><blockquote className="mt-2 min-h-12 text-[13px] leading-6 text-[var(--store-body)]">«{review.subtitle || "تجربة رائعة وخدمة مميزة."}»</blockquote><figcaption className="mt-3 border-t border-[var(--store-line)] pt-2 text-[11px] font-semibold">{review.title}</figcaption></figure>)}</div></div></section>;
 }
 
 function AnimatedProducts({ section, products, background = false, autoPlay = true }: { section: HomepageSection; products: ProductDTO[]; background?: boolean; autoPlay?: boolean }) {
@@ -223,11 +220,11 @@ function AnimatedProducts({ section, products, background = false, autoPlay = tr
 
 function StoreFeatures({ section }: { section: HomepageSection }) {
   if (!section.items.length) return <TrustStrip />;
-  return <section className="mx-auto w-full max-w-7xl px-4 py-6"><SectionTitle title={section.title} subtitle={section.subtitle} /><div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">{section.items.map((item) => <div key={item.id} className="flex items-center gap-2.5 rounded-xl bg-[var(--store-card)] p-3 ring-1 ring-[var(--store-line)]"><span className="grid h-9 w-9 place-items-center rounded-lg bg-[var(--store-surface)] text-xl">{item.imageUrl ? <img src={item.imageUrl} alt="" className="h-7 w-7 object-contain" /> : "✓"}</span><div><p className="text-[12px] font-semibold">{item.title}</p><p className="text-[11px] text-[var(--store-muted)]">{item.subtitle}</p></div></div>)}</div></section>;
+  return <section className="mx-auto w-full max-w-7xl px-4 py-6"><SectionTitle title={section.title} subtitle={section.subtitle} /><div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">{section.items.map((item) => <div key={item.id} className="flex items-center gap-2.5 rounded-xl bg-[var(--store-card)] p-3 ring-1 ring-[var(--store-line)]"><span className="grid h-9 w-9 place-items-center rounded-lg bg-[var(--store-surface)] text-xl">{item.imageUrl ? <img src={item.imageUrl} alt="" className="h-7 w-7 object-contain" /> : "✓"}</span><div><p className="text-[13px] font-semibold">{item.title}</p><p className="text-[11px] text-[var(--store-muted)]">{item.subtitle}</p></div></div>)}</div></section>;
 }
 
 function ItemList({ section }: { section: HomepageSection }) {
-  return <section className="mx-auto w-full max-w-7xl px-4 py-6"><SectionTitle title={section.title} subtitle={section.subtitle} /><div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">{section.items.map((item) => <Link key={item.id} href={item.href || "/products"} className="flex items-center gap-3 rounded-xl bg-[var(--store-card)] p-3 ring-1 ring-[var(--store-line)] transition hover:-translate-y-0.5">{item.imageUrl ? <img src={item.imageUrl} alt="" className="h-12 w-12 rounded-lg object-cover" /> : <span className="grid h-12 w-12 place-items-center rounded-lg bg-[var(--store-surface)] text-xl">↗</span>}<span className="min-w-0 flex-1"><span className="block truncate text-[12px] font-semibold">{item.title}</span><span className="block truncate text-[11px] text-[var(--store-muted)]">{item.subtitle}</span></span><Icon name="chevronLeft" className="h-3.5 w-3.5 text-[var(--store-primary)]" /></Link>)}</div></section>;
+  return <section className="mx-auto w-full max-w-7xl px-4 py-6"><SectionTitle title={section.title} subtitle={section.subtitle} /><div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">{section.items.map((item) => <Link key={item.id} href={item.href || "/products"} className="flex items-center gap-3 rounded-xl bg-[var(--store-card)] p-3 ring-1 ring-[var(--store-line)]">{item.imageUrl ? <img src={item.imageUrl} alt="" className="h-12 w-12 rounded-lg object-cover" /> : <span className="grid h-12 w-12 place-items-center rounded-lg bg-[var(--store-surface)] text-xl">↗</span>}<span className="min-w-0 flex-1"><span className="block truncate text-[13px] font-semibold">{item.title}</span><span className="block truncate text-[11px] text-[var(--store-muted)]">{item.subtitle}</span></span><Icon name="chevronLeft" className="h-3.5 w-3.5 text-[var(--store-primary)]" /></Link>)}</div></section>;
 }
 
 function SquareBanners({ section, categories }: { section: HomepageSection; categories: StoreCategoryDTO[] }) {
@@ -240,7 +237,7 @@ function SquareBanners({ section, categories }: { section: HomepageSection; cate
         {items.map((item) => <Link key={item.id} href={item.href || "/products"} className="group relative aspect-square overflow-hidden rounded-2xl border border-[var(--store-line)] bg-[var(--store-surface)]">
           {item.imageUrl ? item.mediaType === "video" ? <video src={item.imageUrl} autoPlay muted loop playsInline className="h-full w-full object-cover transition duration-500 group-hover:scale-105" /> : <img src={item.imageUrl} alt={item.title} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" /> : <span className="grid h-full place-items-center text-4xl">🥩</span>}
           <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
-          <div className="absolute inset-x-0 bottom-0 p-3 text-white"><p className="text-[12px] font-semibold">{item.title}</p><p className="mt-0.5 text-[11px] text-white/75">{item.subtitle}</p></div>
+          <div className="absolute inset-x-0 bottom-0 p-3 text-white"><p className="text-[13px] font-semibold">{item.title}</p><p className="mt-0.5 text-[11px] text-white/75">{item.subtitle}</p></div>
         </Link>)}
       </div>
     </section>
@@ -257,12 +254,12 @@ function Brands({ section }: { section: HomepageSection }) {
 }
 
 function Reviews({ section }: { section: HomepageSection }) {
-  return <section className="border-y border-[var(--store-line)] bg-[var(--store-surface)] py-9"><div className="mx-auto max-w-7xl px-4"><div className="text-center"><p className="text-[11px] font-semibold text-[var(--store-accent)]">{section.title}</p><h2 className="mt-1 text-xl font-bold text-[var(--store-ink)]">{section.subtitle || "كلامهم يكفي"}</h2><p className="mt-1 text-[12px] text-[var(--store-muted)]">تقييم ٤٫٩ من ٥ بناءً على تقييمات العملاء</p></div><div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">{TESTIMONIALS.map((review) => <figure key={review.name} className="flex h-full flex-col rounded-2xl bg-white p-4 ring-1 ring-[var(--store-line)]"><div className="text-[11px] text-[var(--store-accent)]">★★★★★</div><blockquote className="mt-2 flex-1 text-[12px] leading-6 text-[var(--store-body)]">«{review.quote}»</blockquote><figcaption className="mt-3 flex items-center gap-2 border-t border-[var(--store-line)] pt-3"><span className="grid h-8 w-8 place-items-center rounded-full bg-[var(--store-surface)] text-[11px] font-semibold text-[var(--store-primary)]">{review.initials}</span><div><p className="text-[12px] font-semibold">{review.name}</p><p className="text-[11px] text-[var(--store-muted)]">{review.role}</p></div></figcaption></figure>)}</div></div></section>;
+  return <section className="border-y border-[var(--store-line)] bg-[var(--store-surface)] py-9"><div className="mx-auto max-w-7xl px-4"><div className="text-center"><p className="text-[11px] font-semibold text-[var(--store-accent)]">{section.title}</p><h2 className="mt-1 text-xl font-bold text-[var(--store-ink)]">{section.subtitle || "كلامهم يكفي"}</h2></div><div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">{TESTIMONIALS.map((review) => <figure key={review.name} className="flex h-full flex-col rounded-2xl bg-white p-4 ring-1 ring-[var(--store-line)]"><div className="text-[11px] text-[var(--store-accent)]">★★★★★</div><blockquote className="mt-2 flex-1 text-[13px] leading-6 text-[var(--store-body)]">«{review.quote}»</blockquote><figcaption className="mt-3 flex items-center gap-2 border-t border-[var(--store-line)] pt-3"><span className="grid h-8 w-8 place-items-center rounded-full bg-[var(--store-surface)] text-[11px] font-semibold text-[var(--store-primary)]">{review.initials}</span><div><p className="text-[13px] font-semibold">{review.name}</p><p className="text-[11px] text-[var(--store-muted)]">{review.role}</p></div></figcaption></figure>)}</div></div></section>;
 }
 
 function ProductSection({ section, products, compact = false }: { section: HomepageSection; products: ProductDTO[]; compact?: boolean }) {
   return (
-    <section className={cn("mx-auto w-full max-w-7xl px-4", compact ? "py-7" : "py-8 sm:py-10")}>
+    <section className={cn("mx-auto w-full max-w-7xl px-4", compact ? "py-8" : "py-10 sm:py-14")}>
       <div className="flex flex-wrap items-end justify-between gap-3">
         <SectionTitle title={section.title} subtitle={section.subtitle} />
         <Link href="/products" className="inline-flex items-center gap-1 rounded-full border border-[var(--store-line)] bg-white px-3.5 py-2 text-[11px] font-semibold text-[var(--store-primary)] transition hover:border-[var(--store-accent)]">
@@ -281,8 +278,9 @@ function ProductSection({ section, products, compact = false }: { section: Homep
 }
 
 function CategorySection({ section, categories, storeName }: { section: HomepageSection; categories: StoreCategoryDTO[]; storeName: string }) {
+  void storeName;
   return (
-    <section className="mx-auto w-full max-w-7xl px-4 py-8 sm:py-10">
+    <section className="mx-auto w-full max-w-7xl px-4 py-10 sm:py-14">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <SectionTitle title={section.title} subtitle={section.subtitle || "اختر قسمك المفضل"} />
         <Link href="/products" className="inline-flex items-center gap-1 text-[11px] font-semibold text-[var(--store-primary)]">
@@ -304,11 +302,8 @@ function CategorySection({ section, categories, storeName }: { section: Homepage
             )}
             <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
             <div className="absolute inset-x-0 bottom-0 p-3.5 text-white sm:p-4">
-              <span className="mb-2 inline-flex rounded-full border border-white/20 bg-black/15 px-2 py-1 text-[11px] font-bold text-white/85 backdrop-blur">
-                {category.productCount} منتج
-              </span>
-              <p className="text-sm font-bold">{category.name}</p>
-              <p className="mt-1 line-clamp-1 text-[11px] text-white/75">{category.blurb || `من منتجات ${storeName}`}</p>
+              <p className="text-base font-bold">{category.name}</p>
+              <p className="mt-0.5 line-clamp-1 text-xs text-white/80">{category.productCount} منتج</p>
             </div>
           </Link>
         ))}
@@ -318,9 +313,9 @@ function CategorySection({ section, categories, storeName }: { section: Homepage
 }
 
 function TrustStrip() {
-  return <section className="border-b border-[var(--store-line)] bg-white"><div className="mx-auto grid w-full max-w-7xl grid-cols-2 gap-3 px-4 py-4 lg:grid-cols-4">{TRUST_ITEMS.map((item) => <div key={item.title} className="flex items-center gap-2.5 rounded-xl bg-[var(--store-bg)] px-3 py-2.5 ring-1 ring-[var(--store-line)]"><span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-white text-[var(--store-primary)]"><Icon name={TRUST_ICONS[item.icon]} className="h-5 w-5" /></span><div className="min-w-0"><p className="text-[12px] font-semibold">{item.title}</p><p className="truncate text-[11px] text-[var(--store-muted)]">{item.text}</p></div></div>)}</div></section>;
+  return <section className="border-b border-[var(--store-line)] bg-white"><div className="mx-auto grid w-full max-w-7xl grid-cols-2 gap-3 px-4 py-4 lg:grid-cols-4">{TRUST_ITEMS.map((item) => <div key={item.title} className="flex items-center gap-2.5 rounded-xl bg-[var(--store-bg)] px-3 py-2.5 ring-1 ring-[var(--store-line)]"><span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-white text-[var(--store-primary)]"><Icon name={TRUST_ICONS[item.icon]} className="h-5 w-5" /></span><div className="min-w-0"><p className="text-[13px] font-semibold">{item.title}</p><p className="truncate text-[11px] text-[var(--store-muted)]">{item.text}</p></div></div>)}</div></section>;
 }
 
 function AboutSection({ settings }: { settings: StoreSettings }) {
-  return <section className="mx-auto w-full max-w-7xl px-4 pb-10"><div className="relative overflow-hidden rounded-3xl px-5 py-8 text-white sm:px-9" style={{ background: "var(--store-primary)" }}><div className="relative grid items-center gap-6 lg:grid-cols-[1.4fr_1fr]"><div><p className="text-[11px] font-semibold text-[var(--store-accent)]">{settings.storeName} | {settings.tagline}</p><h2 className="mt-2 text-lg font-bold leading-8 sm:text-2xl">تسوّق أسهل، واختيارات تناسب احتياجك</h2><p className="mt-3 max-w-xl text-[12px] leading-6 text-white/70 sm:text-xs">{settings.about}</p><div className="mt-5 flex flex-wrap gap-2"><Link href="/products" className="inline-flex h-10 items-center gap-2 rounded-xl bg-[var(--store-accent)] px-4 text-[12px] font-semibold text-[var(--store-ink)]">تسوق الآن <Icon name="arrowLeft" className="h-3.5 w-3.5" /></Link><a href={`tel:${settings.phone}`} className="inline-flex h-10 items-center gap-2 rounded-xl bg-white/10 px-4 text-[12px] font-semibold text-white ring-1 ring-white/15"><Icon name="phone" className="h-3.5 w-3.5"/><span dir="ltr">{settings.phone}</span></a></div></div><div className="grid grid-cols-2 gap-2.5"><div className="rounded-2xl bg-white/10 p-3.5 ring-1 ring-white/10"><p className="text-[11px] text-white/60">وثيقة العمل الحر</p><p className="mt-1 text-sm font-semibold text-[var(--store-accent)]" dir="ltr">{settings.freeDocNumber}</p></div><div className="rounded-2xl bg-white/10 p-3.5 ring-1 ring-white/10"><p className="text-[11px] text-white/60">ساعات العمل</p><p className="mt-1 text-[12px] font-semibold">{settings.workingHours}</p></div><div className="rounded-2xl bg-white/10 p-3.5 ring-1 ring-white/10"><p className="text-[11px] text-white/60">التوصيل</p><p className="mt-1 text-[12px] font-semibold">{settings.freeDelivery ? "توصيل مجاني" : "حسب المسافة"}</p></div><div className="rounded-2xl bg-white/10 p-3.5 ring-1 ring-white/10"><p className="text-[11px] text-white/60">الدفع</p><p className="mt-1 text-[12px] font-semibold">خيارات دفع آمنة</p></div></div></div></div></section>;
+  return <section className="mx-auto w-full max-w-7xl px-4 pb-10"><div className="relative overflow-hidden rounded-3xl px-5 py-8 text-white sm:px-9" style={{ background: "var(--store-primary)" }}><div className="relative grid items-center gap-6 lg:grid-cols-[1.4fr_1fr]"><div><p className="text-[11px] font-semibold text-[var(--store-accent)]">{settings.storeName} | {settings.tagline}</p><h2 className="mt-2 text-lg font-bold leading-8 sm:text-2xl">تسوّق أسهل، واختيارات تناسب احتياجك</h2><p className="mt-3 max-w-xl text-[13px] leading-6 text-white/70 sm:text-xs">{settings.about}</p><div className="mt-5 flex flex-wrap gap-2"><Link href="/products" className="inline-flex h-10 items-center gap-2 rounded-xl bg-[var(--store-accent)] px-4 text-[13px] font-semibold text-[var(--store-ink)]">تسوق الآن <Icon name="arrowLeft" className="h-3.5 w-3.5" /></Link><a href={`tel:${settings.phone}`} className="inline-flex h-10 items-center gap-2 rounded-xl bg-white/10 px-4 text-[13px] font-semibold text-white ring-1 ring-white/15"><Icon name="phone" className="h-3.5 w-3.5"/><span dir="ltr">{settings.phone}</span></a></div></div><div className="grid grid-cols-2 gap-2.5"><div className="rounded-2xl bg-white/10 p-3.5 ring-1 ring-white/10"><p className="text-[11px] text-white/60">وثيقة العمل الحر</p><p className="mt-1 text-sm font-semibold text-[var(--store-accent)]" dir="ltr">{settings.freeDocNumber}</p></div><div className="rounded-2xl bg-white/10 p-3.5 ring-1 ring-white/10"><p className="text-[11px] text-white/60">ساعات العمل</p><p className="mt-1 text-[13px] font-semibold">{settings.workingHours}</p></div><div className="rounded-2xl bg-white/10 p-3.5 ring-1 ring-white/10"><p className="text-[11px] text-white/60">التوصيل</p><p className="mt-1 text-[13px] font-semibold">{settings.freeDelivery ? "توصيل مجاني" : "حسب المسافة"}</p></div><div className="rounded-2xl bg-white/10 p-3.5 ring-1 ring-white/10"><p className="text-[11px] text-white/60">الدفع</p><p className="mt-1 text-[13px] font-semibold">خيارات دفع آمنة</p></div></div></div></div></section>;
 }
