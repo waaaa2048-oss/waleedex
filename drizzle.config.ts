@@ -1,4 +1,7 @@
-import "dotenv/config";
+import { config } from "dotenv";
+
+config({ path: ".env.local" });
+config(); // fallback to .env
 import { defineConfig } from "drizzle-kit";
 
 if (!process.env.DATABASE_URL) {
