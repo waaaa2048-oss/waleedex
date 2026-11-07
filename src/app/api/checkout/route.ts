@@ -206,7 +206,7 @@ export async function POST(request: Request) {
       : '';
     const finalNotes = [deliveryInfo, cuttingInfo, frozenInfo, typeof notes === 'string' ? notes : ''].filter(Boolean).join(' | ');
 
-    // إدخال الطلب وتخزين إيصال التحويل البنكي في قاعدة البيانات
+    // إدخال الطلب وتخزين إيصال التحويل البنكي في قاعدة البيانات (تم تعديل الحقل إلى paymentReceiptPath)
     const [newOrder] = await db
       .insert(orders)
       .values({
@@ -219,7 +219,7 @@ export async function POST(request: Request) {
         deliveryAddress: fullAddress,
         deliveryFee: '0',
         paymentMethod: requestedMethod,
-        paymentReceipt: typeof paymentReceipt === 'string' ? paymentReceipt : null,
+        paymentReceiptPath: typeof paymentReceipt === 'string' ? paymentReceipt : null,
         notes: finalNotes,
         totalAmount: String(calculatedTotal),
         paidAmount: '0',
