@@ -206,7 +206,7 @@ export async function POST(request: Request) {
       : '';
     const finalNotes = [deliveryInfo, cuttingInfo, frozenInfo, typeof notes === 'string' ? notes : ''].filter(Boolean).join(' | ');
 
-    // إدخال الطلب وتخزين إيصال التحويل البنكي في قاعدة البيانات (تم تعديل الحقل إلى paymentReceiptPath)
+    // إدخال الطلب وتخزين إيصال التحويل البنكي مع تصحيح اسم الحقل ليوافق قاعدة البيانات (paymentReceiptPath)
     const [newOrder] = await db
       .insert(orders)
       .values({
