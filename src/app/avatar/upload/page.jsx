@@ -23,7 +23,8 @@ export default function AvatarUploadPage() {
             },
           );
 
-          const newBlob = (await response.json()) as PutBlobResult;
+          // تم تعديل هذا السطر بإزالة `as PutBlobResult` ليتوافق مع ملفات JavaScript (JSX)
+          const newBlob = await response.json();
 
           setBlob(newBlob);
         }}
