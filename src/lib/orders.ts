@@ -71,7 +71,7 @@ export function parseOrderPayload(body: unknown): ParseResult<OrderInput> {
   const fulfillment = asText(payload.fulfillment) === "pickup" ? "pickup" : "delivery";
   const paidAmount = Math.max(0, asNumber(payload.paidAmount) ?? 0);
   const deliveryFee = Math.max(0, asNumber(payload.deliveryFee) ?? 0);
-  const paymentReceipt = asOptionalText(payload.paymentReceipt);
+  const paymentReceiptPath = asOptionalText(payload.paymentReceiptPath ?? payload.paymentReceipt);
 
   return {
     ok: true,
@@ -85,10 +85,10 @@ export function parseOrderPayload(body: unknown): ParseResult<OrderInput> {
       notes: asOptionalText(payload.notes),
       paymentMethod: asText(payload.paymentMethod) || "cash",
       paidAmount,
-      paymentReceipt,
+      paymentReceiptPath,
       items,
       services: serviceLines,
-    },
+    } as unknown as OrderInput,
   };
 }
 
@@ -144,7 +144,6 @@ export async function calculateOrderLines(input: Pick<OrderInput, "items" | "ser
     })
     .filter((line): line is NonNullable<typeof line> => line !== null);
 
-  // Report missing IDs so callers can reject partial orders.
   const foundProductIds = new Set(items.map((line) => line.productId));
   const missingProductIds = input.items
     .map((line) => line.productId)
@@ -200,6 +199,9 @@ export async function createOrder(input: OrderInput): Promise<OrderDTO> {
     input.deliveryAddress ??
     (input.fulfillment === "delivery" ? (customer[0].address ?? customer[0].city) : "استلام من الفرع");
 
+  const rawInput = input as Record<string, unknown>;
+  const paymentReceiptPathVal = (rawInput.paymentReceiptPath ?? rawInput.paymentReceipt) as string | null;
+
   const orderId = await db.transaction(async (tx) => {
     const [created] = await tx
       .insert(orders)
@@ -216,7 +218,7 @@ export async function createOrder(input: OrderInput): Promise<OrderDTO> {
         totalAmount: String(total),
         paidAmount: String(Math.min(input.paidAmount ?? 0, total)),
         paymentMethod: input.paymentMethod ?? "cash",
-        paymentReceipt: input.paymentReceipt ?? null,
+        paymentReceiptPath: paymentReceiptPathVal ?? null,
       })
       .returning({ id: orders.id });
 
@@ -234,7 +236,7 @@ export async function createOrder(input: OrderInput): Promise<OrderDTO> {
 
 /* ───────────── Update ───────────── */
 
-export type OrderUpdatePayload = Partial<OrderInput> & { recalculate?: boolean };
+export type OrderUpdatePayload = Partial<OrderInput> & { recalculate?: boolean; paymentReceiptPath?: string | null; paymentReceipt?: string | null };
 
 export async function updateOrder(id: number, payload: OrderUpdatePayload): Promise<OrderDTO> {
   const existing = await getOrderById(id);
@@ -291,8 +293,10 @@ export async function updateOrder(id: number, payload: OrderUpdatePayload): Prom
     if (payload.paymentMethod && payload.paymentMethod in PAYMENT_METHODS) {
       values.paymentMethod = payload.paymentMethod;
     }
-    if (payload.paymentReceipt !== undefined) {
-      values.paymentReceipt = payload.paymentReceipt;
+    
+    const receiptValue = payload.paymentReceiptPath !== undefined ? payload.paymentReceiptPath : payload.paymentReceipt;
+    if (receiptValue !== undefined) {
+      values.paymentReceiptPath = receiptValue;
     }
 
     if (computed || deliveryFeeChanged) {
