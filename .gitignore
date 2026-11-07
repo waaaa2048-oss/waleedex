@@ -1,1 +1,25 @@
 node_modules
+
+# env / secrets
+.env
+.env.*
+!.env.example
+
+# build output & packaged apps
+.next/
+out/
+release/
+*.tsbuildinfo
+android/app/build/
+android/.gradle/
+android/local.properties
+*.keystore
+*.jks
+
+# logs & scratch files
+*.log
+all.txt
+headers.txt
+page.html
+*.bak
+*.original
